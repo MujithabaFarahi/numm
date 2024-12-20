@@ -77,7 +77,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
                   : const ImageIconBuilder(
                       image: 'assets/icons/bag-outline.png',
                     ),
-              label: 'Add Item',
+              label: 'Bags',
             ),
             BottomNavigationBarItem(
               icon: _selectedIndex == 2

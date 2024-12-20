@@ -21,6 +21,10 @@ class PrimaryTextfield extends StatelessWidget {
   final String? errorText;
   final bool obscureText;
   final VoidCallback? onIconPressed;
+  final TextInputType? keyboardType;
+  final void Function(String)? onChanged;
+  final TextAlign textAlign;
+  final FocusNode? focusNode;
 
   const PrimaryTextfield({
     super.key,
@@ -42,6 +46,10 @@ class PrimaryTextfield extends StatelessWidget {
     this.errorText,
     this.onIconPressed,
     this.obscureText = false,
+    this.keyboardType,
+    this.onChanged,
+    this.textAlign = TextAlign.start,
+    this.focusNode,
   });
 
   @override
@@ -50,6 +58,10 @@ class PrimaryTextfield extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TextField(
+          focusNode: focusNode,
+          textAlign: textAlign,
+          keyboardType: keyboardType,
+          onChanged: onChanged,
           controller: controller,
           obscureText: obscureText,
           decoration: InputDecoration(
@@ -75,7 +87,7 @@ class PrimaryTextfield extends StatelessWidget {
               fontFamily: fontFamily,
               fontSize: fontSize,
               fontWeight: fontWeight,
-              color: textColor.withOpacity(0.7), // Adjust hint text visibility
+              color: textColor.withOpacity(0.7),
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(borderRadius),
@@ -113,7 +125,7 @@ class PrimaryTextfield extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 8.0, left: 4.0),
             child: Text(
-              errorText ?? '$labelText you entered is invalid',
+              errorText ?? '${labelText ?? 'Input'} you entered is invalid',
               style: TextStyle(
                 fontFamily: fontFamily,
                 fontSize: fontSize - 2,

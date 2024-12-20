@@ -7,14 +7,14 @@ import 'package:nummlk/widgets/primary_button.dart';
 import 'package:nummlk/widgets/primary_textfield.dart';
 import 'package:uuid/uuid.dart';
 
-class AddItem extends StatefulWidget {
-  const AddItem({super.key});
+class UpdateItem extends StatefulWidget {
+  const UpdateItem({super.key});
 
   @override
-  State<AddItem> createState() => _AddItemState();
+  State<UpdateItem> createState() => _UpdateItemState();
 }
 
-class _AddItemState extends State<AddItem> {
+class _UpdateItemState extends State<UpdateItem> {
   String? _selectedGarment;
   int quantity = 1;
   final List<String> _dropdownOptions = ['Lulu', 'Naleem', 'Akram'];

@@ -40,8 +40,8 @@ class _MyAppState extends State<MyApp> {
           onSurface: ColorPalette.primaryTextColor,
           primary: Color.fromARGB(255, 18, 39, 144),
           onPrimary: Colors.white,
-          secondary: Colors.white,
-          onSecondary: Color.fromARGB(255, 56, 88, 255),
+          // secondary: Colors.white,
+          // onSecondary: Color.fromARGB(255, 56, 88, 255),
         ),
         pageTransitionsTheme: const PageTransitionsTheme(
           builders: <TargetPlatform, PageTransitionsBuilder>{

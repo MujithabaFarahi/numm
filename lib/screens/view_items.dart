@@ -19,11 +19,6 @@ class _ViewItemsState extends State<ViewItems> {
 
   Stream<QuerySnapshot>? bagStream;
 
-  getontheload() async {
-    bagStream = DatabaseMethods().getAllItems();
-    setState(() {});
-  }
-
   @override
   void initState() {
     _getAllItems();
@@ -49,7 +44,18 @@ class _ViewItemsState extends State<ViewItems> {
       stream: bagStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return ListView.builder(
+              itemCount: 8,
+              itemBuilder: (context, index) {
+                return const BagCard(
+                  isLoading: true,
+                  name: 'name',
+                  garment: 'garment',
+                  colors: ['Colors', 'Color'],
+                  quantities: [0, 0],
+                  quantitySold: 0,
+                );
+              });
         }
 
         if (snapshot.hasError) {
@@ -67,12 +73,16 @@ class _ViewItemsState extends State<ViewItems> {
 
             String name = ds["name"] ?? "Unknown";
             String garment = ds["garment"] ?? "Unknown";
+            int quantitySold = ds["quantitySold"] ?? 0;
             List<String> colors = List<String>.from(ds["colors"] ?? []);
+            List<int> quantities = List<int>.from(ds["quantity"] ?? []);
 
             return BagCard(
               name: name,
               garment: garment,
               colors: colors,
+              quantities: quantities,
+              quantitySold: quantitySold,
             );
           },
         );

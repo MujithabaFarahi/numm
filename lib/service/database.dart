@@ -20,4 +20,11 @@ class DatabaseMethods {
         .where("garment", isEqualTo: garment)
         .snapshots(includeMetadataChanges: true);
   }
+
+  Future addOrder(Map<String, dynamic> orderInfoMap, String id) async {
+    return await FirebaseFirestore.instance
+        .collection("Orders")
+        .doc(id)
+        .set(orderInfoMap);
+  }
 }

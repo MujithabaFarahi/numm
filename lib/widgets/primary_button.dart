@@ -46,31 +46,44 @@ class PrimaryButton extends StatelessWidget {
             color: borderColor,
           )),
       child: Material(
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(borderRadius),
         child: InkWell(
-          onTap: onPressed,
+          onTap: isLoading ? null : onPressed,
           borderRadius: BorderRadius.circular(borderRadius),
           splashColor: ColorPalette.mainBlue[300],
           highlightColor: ColorPalette.mainBlue[200],
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (icon != null)
-                ImageIconBuilder(
-                  image: icon!,
+          child: isLoading
+              ? Center(
+                  child: SizedBox(
+                    height: 25,
+                    width: 25,
+                    child: CircularProgressIndicator(
+                      color: foregroundColor,
+                      strokeWidth: 3,
+                    ),
+                  ),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (icon != null)
+                      ImageIconBuilder(
+                        isOriginal: true,
+                        image: icon!,
+                      ),
+                    if (icon != null) const SizedBox(width: 8),
+                    Text(
+                      text,
+                      style: TextStyle(
+                        color: foregroundColor,
+                        fontFamily: fontFamily,
+                        fontSize: fontSize,
+                        fontWeight: fontWeight,
+                      ),
+                    ),
+                  ],
                 ),
-              if (icon != null) const SizedBox(width: 8),
-              Text(
-                text,
-                style: TextStyle(
-                  color: foregroundColor,
-                  fontFamily: fontFamily,
-                  fontSize: fontSize,
-                  fontWeight: fontWeight,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
