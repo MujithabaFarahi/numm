@@ -21,6 +21,20 @@ class DatabaseMethods {
         .snapshots(includeMetadataChanges: true);
   }
 
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getItemById(String id) {
+    return FirebaseFirestore.instance
+        .collection("Bags")
+        .doc(id)
+        .snapshots(includeMetadataChanges: true);
+  }
+
+  Future updateItem(Map<String, dynamic> updatedData, String id) async {
+    return await FirebaseFirestore.instance
+        .collection("Bags")
+        .doc(id)
+        .update(updatedData);
+  }
+
   Future addOrder(Map<String, dynamic> orderInfoMap, String id) async {
     return await FirebaseFirestore.instance
         .collection("Orders")

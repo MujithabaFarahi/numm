@@ -4,7 +4,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 class BagCard extends StatelessWidget {
   final String name;
-  final String? id;
+  final String id;
   final String garment;
   final int quantitySold;
   final List<String> colors;
@@ -14,7 +14,7 @@ class BagCard extends StatelessWidget {
   const BagCard({
     super.key,
     required this.name,
-    this.id,
+    required this.id,
     required this.garment,
     required this.quantitySold,
     required this.colors,
@@ -58,25 +58,23 @@ class BagCard extends StatelessWidget {
                   // ),
 
                   SizedBox(
-                    width: 100,
+                    width: 90,
                     child: Text(
                       name,
                       style: const TextStyle(
                           fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  Container(
-                    width: 40,
-                    alignment: Alignment.centerLeft,
+                  SizedBox(
+                    // width: 40,
                     child: Text(
                       garment[0],
                       style: const TextStyle(
                           fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  Container(
-                    width: 40,
-                    alignment: Alignment.centerLeft,
+                  SizedBox(
+                    // width: 40,
                     child: Text(
                       '$quantitySold',
                       style: const TextStyle(
@@ -84,7 +82,6 @@ class BagCard extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 110,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: List.generate(colors.length, (index) {
@@ -96,6 +93,14 @@ class BagCard extends StatelessWidget {
                         );
                       }),
                     ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/updateItem', arguments: {
+                        "id": id,
+                      });
+                    },
+                    icon: const Icon(Icons.edit),
                   ),
                 ],
               ),

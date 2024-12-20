@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:nummlk/service/database.dart';
+import 'package:nummlk/theme/color_pallette.dart';
 import 'package:nummlk/widgets/appbar.dart';
 import 'package:nummlk/widgets/custom_dropdown.dart';
 import 'package:nummlk/widgets/custom_toast.dart';
@@ -8,7 +10,12 @@ import 'package:nummlk/widgets/primary_textfield.dart';
 import 'package:uuid/uuid.dart';
 
 class UpdateItem extends StatefulWidget {
-  const UpdateItem({super.key});
+  final String id;
+
+  const UpdateItem({
+    required this.id,
+    super.key,
+  });
 
   @override
   State<UpdateItem> createState() => _UpdateItemState();
@@ -16,10 +23,12 @@ class UpdateItem extends StatefulWidget {
 
 class _UpdateItemState extends State<UpdateItem> {
   String? _selectedGarment;
+  Stream<DocumentSnapshot>? bag;
   int quantity = 1;
-  final List<String> _dropdownOptions = ['Lulu', 'Naleem', 'Akram'];
-  final List<String> _availableColors = [];
-  final List<int?> _availableQuantity = [];
+  List<String> _availableColors = [];
+  List<int?> _availableQuantity = [];
+  bool isLoading = true;
+  int? selectedIndex;
 
   final TextEditingController _colorController = TextEditingController();
   final TextEditingController _bagController = TextEditingController();
@@ -30,6 +39,39 @@ class _UpdateItemState extends State<UpdateItem> {
   void initState() {
     super.initState();
     _quantityController.text = quantity.toString();
+    _fetchBagData();
+  }
+
+  Future<void> _fetchBagData() async {
+    try {
+      final docSnapshot = await FirebaseFirestore.instance
+          .collection("Bags")
+          .doc(widget.id)
+          .get();
+
+      if (docSnapshot.exists) {
+        final data = docSnapshot.data() as Map<String, dynamic>;
+
+        setState(() {
+          _bagController.text = data['name'] ?? '';
+          _selectedGarment = data['garment'];
+          _availableColors = List<String>.from(data['colors'] ?? []);
+          _availableQuantity = List<int>.from(data['quantity'] ?? []);
+          _quantityController.text = quantity.toString();
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        debugPrint("Item not found");
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+      });
+      debugPrint("Failed to load item data: $error");
+    }
   }
 
   @override
@@ -55,7 +97,7 @@ class _UpdateItemState extends State<UpdateItem> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(
-        title: 'Add Item',
+        title: 'Update Item',
         showBackButton: true,
       ),
       body: LayoutBuilder(builder: (context, constraints) {
@@ -78,15 +120,8 @@ class _UpdateItemState extends State<UpdateItem> {
                       ),
                       const SizedBox(height: 20),
                       CustomDropdown(
-                        hintText: 'Select Garment',
                         labelText: 'Garment',
                         value: _selectedGarment,
-                        options: _dropdownOptions,
-                        onChanged: (newValue) {
-                          setState(() {
-                            _selectedGarment = newValue;
-                          });
-                        },
                       ),
                       const SizedBox(height: 20),
                       Row(
@@ -139,57 +174,101 @@ class _UpdateItemState extends State<UpdateItem> {
                         ],
                       ),
                       const SizedBox(height: 20),
+                      (selectedIndex != null)
+                          ? const Column(
+                              children: [
+                                Text(
+                                    'Enter How What Quantity you want to Add For The Selected Color Below and tap Add'),
+                                SizedBox(height: 10),
+                              ],
+                            )
+                          : Container(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          PrimaryButton(
-                            text: "Add",
-                            onPressed: () {
-                              final newColor = _colorController.text
-                                      .trim()
-                                      .split(' ')
-                                      .map((word) => word.toLowerCase())
-                                      .join('')
-                                      .substring(0, 1)
-                                      .toUpperCase() +
-                                  _colorController.text
-                                      .trim()
-                                      .split(' ')
-                                      .map((word) => word.toLowerCase())
-                                      .join('')
-                                      .substring(1);
-                              final newQuantity =
-                                  int.tryParse(_quantityController.text);
+                          Expanded(
+                              child: (selectedIndex != null)
+                                  ? PrimaryButton(
+                                      text: "Cancel",
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: ColorPalette.primaryBlue,
+                                      borderColor: ColorPalette.primaryBlue,
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedIndex = null;
+                                        });
+                                      })
+                                  : Container()),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Expanded(
+                            child: PrimaryButton(
+                              text: "Add",
+                              onPressed: (selectedIndex != null)
+                                  ? () {
+                                      _availableQuantity[selectedIndex!] =
+                                          _availableQuantity[selectedIndex!]! +
+                                              quantity;
 
-                              if (newColor.isNotEmpty) {
-                                if (!_availableColors.contains(newColor)) {
-                                  setState(() {
-                                    _availableColors.add(newColor);
-                                    _availableQuantity.add(newQuantity);
-                                    _colorController.clear();
-                                    _updateQuantity(1);
-                                  });
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content:
-                                          Text('$newColor is already added'),
-                                      duration: const Duration(seconds: 1),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                }
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Please enter a color'),
-                                    duration: Duration(seconds: 1),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                              }
-                            },
-                            width: 120,
+                                      _updateQuantity(1);
+
+                                      setState(() {
+                                        selectedIndex = null;
+                                      });
+                                    }
+                                  : () {
+                                      final newColor = _colorController.text
+                                              .trim()
+                                              .split(' ')
+                                              .map((word) => word.toLowerCase())
+                                              .join('')
+                                              .substring(0, 1)
+                                              .toUpperCase() +
+                                          _colorController.text
+                                              .trim()
+                                              .split(' ')
+                                              .map((word) => word.toLowerCase())
+                                              .join('')
+                                              .substring(1);
+                                      final newQuantity = int.tryParse(
+                                          _quantityController.text);
+
+                                      if (newColor.isNotEmpty) {
+                                        if (!_availableColors
+                                            .contains(newColor)) {
+                                          setState(() {
+                                            _availableColors.add(newColor);
+                                            _availableQuantity.add(newQuantity);
+                                            _colorController.clear();
+                                            _updateQuantity(1);
+                                          });
+                                        } else {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                  '$newColor is already added'),
+                                              duration:
+                                                  const Duration(seconds: 1),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                        }
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content:
+                                                Text('Please enter a color'),
+                                            duration: Duration(seconds: 1),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
+                                    },
+                              width: 120,
+                            ),
                           ),
                         ],
                       ),
@@ -236,40 +315,50 @@ class _UpdateItemState extends State<UpdateItem> {
                                     ),
                                   ),
                                 ),
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 4.0),
-                                  child: Material(
-                                    elevation: 1,
-                                    borderRadius: BorderRadius.circular(4),
-                                    child: Container(
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 16, vertical: 6),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              color,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      selectedIndex = index;
+                                    });
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 4.0),
+                                    child: Material(
+                                      elevation: 1,
+                                      borderRadius: BorderRadius.circular(4),
+                                      child: Container(
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          color: (selectedIndex == index)
+                                              ? ColorPalette.positiveColor[300]
+                                              : Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 6),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                color,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
                                               ),
-                                            ),
-                                            Text(
-                                              quantity.toString(),
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
+                                              Text(
+                                                quantity.toString(),
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -302,24 +391,19 @@ class _UpdateItemState extends State<UpdateItem> {
                         return;
                       }
 
-                      String id = const Uuid().v4();
-
                       Map<String, dynamic> bagInfoMap = {
-                        "id": id,
+                        "id": widget.id,
                         "name": _bagController.text,
-                        "garment": _selectedGarment,
                         "colors": _availableColors,
                         "quantity": _availableQuantity,
-                        "quantitySold": 0,
-                        "createdAt": DateTime.now().toIso8601String(),
                         "lastUpdated": DateTime.now().toIso8601String(),
                       };
 
                       await DatabaseMethods()
-                          .addItem(bagInfoMap, id)
+                          .updateItem(bagInfoMap, widget.id)
                           .then((value) {
                         CustomToast.show(
-                          "Bag Details added successfully",
+                          "Bag Details Updated successfully",
                           bgColor: Colors.green,
                           textColor: Colors.white,
                         );
@@ -332,7 +416,7 @@ class _UpdateItemState extends State<UpdateItem> {
                         // });
                       });
                     },
-                    text: 'Add Bag',
+                    text: 'Update Bag Details',
                   ),
                 ],
               ),

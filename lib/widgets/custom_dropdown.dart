@@ -14,8 +14,8 @@ class CustomDropdown extends StatelessWidget {
   final double fontSize;
   final FontWeight fontWeight;
   final BoxDecoration? decoration;
-  final List<String> options;
-  final ValueChanged<String> onChanged;
+  final List<String>? options;
+  final ValueChanged<String>? onChanged;
 
   const CustomDropdown({
     super.key,
@@ -31,8 +31,8 @@ class CustomDropdown extends StatelessWidget {
     this.fontSize = 12.0,
     this.fontWeight = FontWeight.w500,
     this.decoration,
-    required this.options,
-    required this.onChanged,
+    this.options,
+    this.onChanged,
   });
 
   void _showOptions(BuildContext context) {
@@ -42,11 +42,11 @@ class CustomDropdown extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.all(20.0),
           child: ListView(
-            children: options.map((option) {
+            children: options!.map((option) {
               return ListTile(
                 title: Text(option),
                 onTap: () {
-                  onChanged(option);
+                  onChanged!(option);
                   Navigator.pop(context);
                 },
               );
@@ -63,7 +63,7 @@ class CustomDropdown extends StatelessWidget {
       width: width,
       child: InkWell(
         borderRadius: BorderRadius.circular(borderRadius),
-        onTap: () => _showOptions(context),
+        onTap: (options != null) ? () => _showOptions(context) : null,
         child: InputDecorator(
           decoration: InputDecoration(
             labelText: value?.isNotEmpty == true ? labelText : null,

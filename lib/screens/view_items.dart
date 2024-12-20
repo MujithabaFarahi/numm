@@ -49,6 +49,7 @@ class _ViewItemsState extends State<ViewItems> {
               itemBuilder: (context, index) {
                 return const BagCard(
                   isLoading: true,
+                  id: 'id',
                   name: 'name',
                   garment: 'garment',
                   colors: ['Colors', 'Color'],
@@ -71,6 +72,7 @@ class _ViewItemsState extends State<ViewItems> {
           itemBuilder: (context, index) {
             DocumentSnapshot ds = snapshot.data!.docs[index];
 
+            String id = ds["id"] ?? "Unknown";
             String name = ds["name"] ?? "Unknown";
             String garment = ds["garment"] ?? "Unknown";
             int quantitySold = ds["quantitySold"] ?? 0;
@@ -78,6 +80,7 @@ class _ViewItemsState extends State<ViewItems> {
             List<int> quantities = List<int>.from(ds["quantity"] ?? []);
 
             return BagCard(
+              id: id,
               name: name,
               garment: garment,
               colors: colors,
