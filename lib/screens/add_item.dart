@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nummlk/service/database.dart';
+import 'package:nummlk/theme/color_pallette.dart';
 import 'package:nummlk/widgets/appbar.dart';
 import 'package:nummlk/widgets/custom_dropdown.dart';
 import 'package:nummlk/widgets/custom_toast.dart';
@@ -20,6 +21,8 @@ class _AddItemState extends State<AddItem> {
   final List<String> _dropdownOptions = ['Lulu', 'Naleem', 'Akram'];
   final List<String> _availableColors = [];
   final List<int?> _availableQuantity = [];
+  int? selectedIndex;
+  bool isLoading = false;
 
   final TextEditingController _colorController = TextEditingController();
   final TextEditingController _bagController = TextEditingController();
@@ -89,6 +92,15 @@ class _AddItemState extends State<AddItem> {
                         },
                       ),
                       const SizedBox(height: 20),
+                      (selectedIndex != null)
+                          ? const Column(
+                              children: [
+                                Text(
+                                    'Enter Total Quantity For The Selected Color Below and tap Add'),
+                                SizedBox(height: 10),
+                              ],
+                            )
+                          : Container(),
                       Row(
                         children: [
                           Expanded(
@@ -142,54 +154,88 @@ class _AddItemState extends State<AddItem> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          PrimaryButton(
-                            text: "Add",
-                            onPressed: () {
-                              final newColor = _colorController.text
-                                      .trim()
-                                      .split(' ')
-                                      .map((word) => word.toLowerCase())
-                                      .join('')
-                                      .substring(0, 1)
-                                      .toUpperCase() +
-                                  _colorController.text
-                                      .trim()
-                                      .split(' ')
-                                      .map((word) => word.toLowerCase())
-                                      .join('')
-                                      .substring(1);
-                              final newQuantity =
-                                  int.tryParse(_quantityController.text);
+                          Expanded(
+                              child: (selectedIndex != null)
+                                  ? PrimaryButton(
+                                      text: "Cancel",
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: ColorPalette.primaryBlue,
+                                      borderColor: ColorPalette.primaryBlue,
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedIndex = null;
+                                        });
+                                      })
+                                  : Container()),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Expanded(
+                            child: PrimaryButton(
+                              text: "Add",
+                              onPressed: (selectedIndex != null)
+                                  ? () {
+                                      _availableQuantity[selectedIndex!] =
+                                          quantity;
 
-                              if (newColor.isNotEmpty) {
-                                if (!_availableColors.contains(newColor)) {
-                                  setState(() {
-                                    _availableColors.add(newColor);
-                                    _availableQuantity.add(newQuantity);
-                                    _colorController.clear();
-                                    _updateQuantity(1);
-                                  });
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content:
-                                          Text('$newColor is already added'),
-                                      duration: const Duration(seconds: 1),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                }
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Please enter a color'),
-                                    duration: Duration(seconds: 1),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                              }
-                            },
-                            width: 120,
+                                      _updateQuantity(1);
+
+                                      setState(() {
+                                        selectedIndex = null;
+                                      });
+                                    }
+                                  : () {
+                                      final newColor = _colorController.text
+                                              .trim()
+                                              .split(' ')
+                                              .map((word) => word.toLowerCase())
+                                              .join('')
+                                              .substring(0, 1)
+                                              .toUpperCase() +
+                                          _colorController.text
+                                              .trim()
+                                              .split(' ')
+                                              .map((word) => word.toLowerCase())
+                                              .join('')
+                                              .substring(1);
+                                      final newQuantity = int.tryParse(
+                                          _quantityController.text);
+
+                                      if (newColor.isNotEmpty) {
+                                        if (!_availableColors
+                                            .contains(newColor)) {
+                                          setState(() {
+                                            _availableColors.add(newColor);
+                                            _availableQuantity.add(newQuantity);
+                                            _colorController.clear();
+                                            _updateQuantity(1);
+                                          });
+                                        } else {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                  '$newColor is already added'),
+                                              duration:
+                                                  const Duration(seconds: 1),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                        }
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content:
+                                                Text('Please enter a color'),
+                                            duration: Duration(seconds: 1),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
+                                    },
+                              width: 120,
+                            ),
                           ),
                         ],
                       ),
@@ -210,6 +256,7 @@ class _AddItemState extends State<AddItem> {
                                   setState(() {
                                     _availableColors.removeAt(index);
                                     _availableQuantity.removeAt(index);
+                                    selectedIndex = null;
                                   });
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -236,40 +283,50 @@ class _AddItemState extends State<AddItem> {
                                     ),
                                   ),
                                 ),
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 4.0),
-                                  child: Material(
-                                    elevation: 1,
-                                    borderRadius: BorderRadius.circular(4),
-                                    child: Container(
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 16, vertical: 6),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              color,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      selectedIndex = index;
+                                    });
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 4.0),
+                                    child: Material(
+                                      elevation: 1,
+                                      borderRadius: BorderRadius.circular(4),
+                                      child: Container(
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          color: (selectedIndex == index)
+                                              ? ColorPalette.positiveColor[300]
+                                              : Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 6),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                color,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
                                               ),
-                                            ),
-                                            Text(
-                                              quantity.toString(),
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
+                                              Text(
+                                                quantity.toString(),
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -282,10 +339,17 @@ class _AddItemState extends State<AddItem> {
                     ],
                   ),
                   PrimaryButton(
+                    isLoading: isLoading,
                     onPressed: () async {
+                      setState(() {
+                        isLoading = true;
+                      });
                       if (_bagController.text.isEmpty) {
                         CustomToast.show("Bag name cannot be empty",
                             bgColor: Colors.red);
+                        setState(() {
+                          isLoading = false;
+                        });
                         return;
                       }
 
@@ -293,12 +357,18 @@ class _AddItemState extends State<AddItem> {
                           _selectedGarment!.isEmpty) {
                         CustomToast.show("Please select a garment",
                             bgColor: Colors.red);
+                        setState(() {
+                          isLoading = false;
+                        });
                         return;
                       }
 
                       if (_availableColors.isEmpty) {
                         CustomToast.show("Please add at least one color",
                             bgColor: Colors.red);
+                        setState(() {
+                          isLoading = false;
+                        });
                         return;
                       }
 
@@ -323,13 +393,17 @@ class _AddItemState extends State<AddItem> {
                           bgColor: Colors.green,
                           textColor: Colors.white,
                         );
+                      });
 
-                        // _bagController.clear();
-                        // setState(() {
-                        //   _selectedGarment = null;
-                        //   _availableColors.clear();
-                        //   _availableQuantity.clear();
-                        // });
+                      _bagController.clear();
+                      setState(() {
+                        _selectedGarment = null;
+                        _availableColors.clear();
+                        _availableQuantity.clear();
+                      });
+
+                      setState(() {
+                        isLoading = false;
                       });
                     },
                     text: 'Add Bag',

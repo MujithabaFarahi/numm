@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:nummlk/theme/color_pallette.dart';
+import 'package:nummlk/widgets/custom_toast.dart';
 import 'package:nummlk/widgets/primary_button.dart';
 import 'package:nummlk/widgets/primary_textfield.dart';
 
@@ -27,7 +28,6 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       await _navigateToHome(userCredential.user!);
     } catch (e) {
-      print(e);
       _showError("Login failed: $e");
     }
   }
@@ -49,7 +49,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
       await _navigateToHome(userCredential.user!);
     } catch (e) {
-      print(e);
       _showError("Registration failed: $e");
     }
   }
@@ -72,7 +71,6 @@ class _LoginScreenState extends State<LoginScreen> {
       await _navigateToHome(userCredential.user!);
     } catch (e) {
       _showError("Google Sign-In failed: $e");
-      print(e);
     }
   }
 
@@ -92,11 +90,10 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.pushReplacementNamed(context, '/home');
   }
 
-  // Show error message
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          content: Text(message, style: const TextStyle(color: Colors.red))),
+    CustomToast.show(
+      message,
+      bgColor: Colors.red,
     );
   }
 

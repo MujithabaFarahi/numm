@@ -7,7 +7,6 @@ import 'package:nummlk/widgets/custom_dropdown.dart';
 import 'package:nummlk/widgets/custom_toast.dart';
 import 'package:nummlk/widgets/primary_button.dart';
 import 'package:nummlk/widgets/primary_textfield.dart';
-import 'package:uuid/uuid.dart';
 
 class UpdateItem extends StatefulWidget {
   final String id;
@@ -51,6 +50,10 @@ class _UpdateItemState extends State<UpdateItem> {
 
       if (docSnapshot.exists) {
         final data = docSnapshot.data() as Map<String, dynamic>;
+
+        print('--------------------------');
+        print(data);
+        print('--------------------------');
 
         setState(() {
           _bagController.text = data['name'] ?? '';
@@ -371,6 +374,7 @@ class _UpdateItemState extends State<UpdateItem> {
                     ],
                   ),
                   PrimaryButton(
+                    isLoading: isLoading,
                     onPressed: () async {
                       if (_bagController.text.isEmpty) {
                         CustomToast.show("Bag name cannot be empty",
@@ -391,6 +395,10 @@ class _UpdateItemState extends State<UpdateItem> {
                         return;
                       }
 
+                      setState(() {
+                        isLoading = true;
+                      });
+
                       Map<String, dynamic> bagInfoMap = {
                         "id": widget.id,
                         "name": _bagController.text,
@@ -407,13 +415,10 @@ class _UpdateItemState extends State<UpdateItem> {
                           bgColor: Colors.green,
                           textColor: Colors.white,
                         );
+                      });
 
-                        // _bagController.clear();
-                        // setState(() {
-                        //   _selectedGarment = null;
-                        //   _availableColors.clear();
-                        //   _availableQuantity.clear();
-                        // });
+                      setState(() {
+                        isLoading = false;
                       });
                     },
                     text: 'Update Bag Details',

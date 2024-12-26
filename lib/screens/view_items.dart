@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:nummlk/service/database.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nummlk/Models/bag_model.dart';
+import 'package:nummlk/blocs/Item/item_bloc.dart';
 import 'package:nummlk/theme/color_pallette.dart';
 import 'package:nummlk/widgets/appbar.dart';
 import 'package:nummlk/widgets/bag_card.dart';
-import 'package:nummlk/widgets/custom_dropdown.dart';
+import 'package:nummlk/widgets/search_bar.dart';
 
 class ViewItems extends StatefulWidget {
   const ViewItems({super.key});
@@ -14,80 +16,36 @@ class ViewItems extends StatefulWidget {
 }
 
 class _ViewItemsState extends State<ViewItems> {
-  String _selectedGarment = 'All';
   final List<String> _dropdownOptions = ['All', 'Lulu', 'Naleem', 'Akram'];
 
   Stream<QuerySnapshot>? bagStream;
 
   @override
   void initState() {
-    _getAllItems();
+    final itemBloc = BlocProvider.of<ItemBloc>(context);
+    itemBloc.add(const GetAllItems());
+
     super.initState();
   }
 
-  void _getAllItems() {
-    bagStream = DatabaseMethods().getAllItems();
-    setState(() {});
-  }
-
-  void _filterItemsByGarment(String? garment) {
-    if (garment != 'All') {
-      bagStream = DatabaseMethods().getItemsByGarment(garment!);
-    } else {
-      _getAllItems();
-    }
-    setState(() {});
-  }
-
-  Widget allBagDetails() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: bagStream,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return ListView.builder(
-              itemCount: 8,
-              itemBuilder: (context, index) {
-                return const BagCard(
-                  isLoading: true,
-                  id: 'id',
-                  name: 'name',
-                  garment: 'garment',
-                  colors: ['Colors', 'Color'],
-                  quantities: [0, 0],
-                  quantitySold: 0,
-                );
-              });
-        }
-
-        if (snapshot.hasError) {
-          return const Center(child: Text("An error occurred."));
-        }
-
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Center(child: Text("No bags found."));
-        }
-
-        return ListView.builder(
-          itemCount: snapshot.data!.docs.length,
-          itemBuilder: (context, index) {
-            DocumentSnapshot ds = snapshot.data!.docs[index];
-
-            String id = ds["id"] ?? "Unknown";
-            String name = ds["name"] ?? "Unknown";
-            String garment = ds["garment"] ?? "Unknown";
-            int quantitySold = ds["quantitySold"] ?? 0;
-            List<String> colors = List<String>.from(ds["colors"] ?? []);
-            List<int> quantities = List<int>.from(ds["quantity"] ?? []);
-
-            return BagCard(
-              id: id,
-              name: name,
-              garment: garment,
-              colors: colors,
-              quantities: quantities,
-              quantitySold: quantitySold,
-            );
-          },
+  void _showOptions(BuildContext context, List<String> options) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: ListView(
+            children: options.map((option) {
+              return ListTile(
+                title: Text(option),
+                onTap: () {
+                  final itemBloc = BlocProvider.of<ItemBloc>(context);
+                  itemBloc.add(SortByGarment(option));
+                  Navigator.pop(context);
+                },
+              );
+            }).toList(),
+          ),
         );
       },
     );
@@ -114,25 +72,65 @@ class _ViewItemsState extends State<ViewItems> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CustomDropdown(
-              width: 110,
-              height: 50,
-              hintText: 'Select Garment to Sort',
-              borderColor: Colors.transparent,
-              value: _selectedGarment,
-              options: _dropdownOptions,
-              onChanged: (newValue) {
-                setState(() {
-                  _selectedGarment = newValue;
-                  _filterItemsByGarment(newValue);
-                });
+            CustomSearchBar(
+              onFilterTap: () {
+                _showOptions(context, _dropdownOptions);
+              },
+              onSearch: (query) {
+                final itemBloc = BlocProvider.of<ItemBloc>(context);
+                itemBloc.add(SearchItems(query));
               },
             ),
             const SizedBox(
-              height: 4,
+              height: 12,
             ),
             Expanded(
-              child: allBagDetails(),
+              // child: allBagDetails(),
+              child:
+                  BlocBuilder<ItemBloc, ItemState>(builder: (context, state) {
+                if (state.isLoading && state.bags.isEmpty) {
+                  return ListView.builder(
+                      itemCount: 8,
+                      itemBuilder: (context, index) {
+                        return const BagCard(
+                          isLoading: true,
+                          id: 'id',
+                          name: 'name',
+                          garment: 'garment',
+                          colors: ['Colors', 'Color'],
+                          quantities: [0, 0],
+                          quantitySold: 0,
+                        );
+                      });
+                } else if (state.bags.isEmpty) {
+                  return const Center(child: Text("No bags found."));
+                } else if (state.bags.isNotEmpty) {
+                  return ListView.builder(
+                    itemCount: state.bags.length,
+                    itemBuilder: (context, index) {
+                      Bag ds = state.bags[index];
+
+                      String id = ds.id;
+                      String name = ds.name;
+                      String garment = ds.garment;
+                      int quantitySold = ds.quantitySold;
+                      List<String> colors = ds.colors;
+                      List<int> quantities = ds.quantity;
+
+                      return BagCard(
+                        id: id,
+                        name: name,
+                        garment: garment,
+                        colors: colors,
+                        quantities: quantities,
+                        quantitySold: quantitySold,
+                      );
+                    },
+                  );
+                } else {
+                  return const Center(child: Text("An error occurred."));
+                }
+              }),
             ),
           ],
         ),

@@ -39,7 +39,6 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.all(20.0),
             child: Center(
               child: PrimaryButton(
-                isLoading: true,
                 text: 'Log Out',
                 onPressed: () => _logout(context),
               ),
