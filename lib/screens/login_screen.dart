@@ -40,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text.trim(),
       );
 
-      await _firestore.collection('users').doc(userCredential.user!.uid).set({
+      await _firestore.collection('Users').doc(userCredential.user!.uid).set({
         'name': userCredential.user!.displayName ?? '',
         'email': userCredential.user!.email ?? '',
         'role': 'employee',
@@ -75,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _navigateToHome(User user) async {
-    final userDoc = _firestore.collection('users').doc(user.uid);
+    final userDoc = _firestore.collection('Users').doc(user.uid);
     final userSnapshot = await userDoc.get();
 
     if (!userSnapshot.exists) {
@@ -87,7 +87,9 @@ class _LoginScreenState extends State<LoginScreen> {
       });
     }
 
-    Navigator.pushReplacementNamed(context, '/home');
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/home');
+    }
   }
 
   void _showError(String message) {
@@ -114,11 +116,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Container(
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      color: ColorPalette.primaryBlue,
                     ),
                     child: ClipOval(
                       child: Image.asset(
-                        'assets/images/logo.jpg',
+                        'assets/images/logo.png',
                         height: 100,
                       ),
                     ),

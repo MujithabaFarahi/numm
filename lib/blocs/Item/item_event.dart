@@ -11,6 +11,15 @@ final class GetAllItems extends ItemEvent {
   List<Object?> get props => [];
 }
 
+final class GetItemById extends ItemEvent {
+  final String id;
+
+  const GetItemById(this.id);
+
+  @override
+  List<Object?> get props => [id];
+}
+
 final class SearchItems extends ItemEvent {
   final String query;
   const SearchItems(

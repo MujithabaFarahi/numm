@@ -8,16 +8,18 @@ class DatabaseMethods {
         .set(itemInfoMap);
   }
 
+  Future<bool> isNameUnique(String name) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection("Bags")
+        .where("name", isEqualTo: name)
+        .get();
+
+    return querySnapshot.docs.isEmpty;
+  }
+
   Stream<QuerySnapshot> getAllItems() {
     return FirebaseFirestore.instance
         .collection("Bags")
-        .snapshots(includeMetadataChanges: true);
-  }
-
-  Stream<QuerySnapshot> getItemsByGarment(String garment) {
-    return FirebaseFirestore.instance
-        .collection("Bags")
-        .where("garment", isEqualTo: garment)
         .snapshots(includeMetadataChanges: true);
   }
 
@@ -25,6 +27,13 @@ class DatabaseMethods {
     return FirebaseFirestore.instance
         .collection("Bags")
         .doc(id)
+        .snapshots(includeMetadataChanges: true);
+  }
+
+  Stream<QuerySnapshot> getItemsByGarment(String garment) {
+    return FirebaseFirestore.instance
+        .collection("Bags")
+        .where("garment", isEqualTo: garment)
         .snapshots(includeMetadataChanges: true);
   }
 

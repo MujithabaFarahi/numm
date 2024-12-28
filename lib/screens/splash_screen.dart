@@ -32,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _navigateToHome(User user) async {
-    final userDoc = _firestore.collection('users').doc(user.uid);
+    final userDoc = _firestore.collection('Users').doc(user.uid);
     final userSnapshot = await userDoc.get();
 
     if (!userSnapshot.exists) {
@@ -57,19 +57,24 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorPalette.white,
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/splashbg.png'),
-            fit: BoxFit.cover,
+      body: Stack(
+        children: [
+          Expanded(
+            child: Image.asset(
+              'assets/images/splashbg.png',
+              color: ColorPalette.mainBlue[100],
+              fit: BoxFit.cover,
+              height: MediaQuery.of(context).size.height,
+            ),
           ),
-        ),
-        child: Center(
-          child: Image.asset(
-            'assets/images/logo.jpg',
-            width: 150,
+          Center(
+            child: Image.asset(
+              'assets/images/logo.png',
+              width: 150,
+            ),
+            // ),
           ),
-        ),
+        ],
       ),
     );
   }

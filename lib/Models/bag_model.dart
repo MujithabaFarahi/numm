@@ -4,7 +4,8 @@ class Bag {
   final String garment;
   final List<String> colors;
   final List<int> quantity;
-  final int quantitySold;
+  final List<int> quantitySold;
+  final int totalQuantitySold;
   final DateTime createdAt;
   final DateTime lastUpdated;
 
@@ -15,6 +16,7 @@ class Bag {
     required this.colors,
     required this.quantity,
     required this.quantitySold,
+    required this.totalQuantitySold,
     required this.createdAt,
     required this.lastUpdated,
   });
@@ -27,7 +29,8 @@ class Bag {
       garment: data['garment'] ?? '',
       colors: List<String>.from(data['colors'] ?? []),
       quantity: List<int>.from(data['quantity'] ?? []),
-      quantitySold: data['quantitySold'] ?? 0,
+      quantitySold: List<int>.from(data['quantitySold'] ?? []),
+      totalQuantitySold: data['totalQuantitySold'] ?? 0,
       createdAt:
           DateTime.parse(data['createdAt'] ?? DateTime.now().toIso8601String()),
       lastUpdated: DateTime.parse(
@@ -43,7 +46,8 @@ class Bag {
       garment: map['garment'] ?? '',
       colors: List<String>.from(map['colors'] ?? []),
       quantity: List<int>.from(map['quantity'] ?? []),
-      quantitySold: map['quantitySold'] ?? 0,
+      quantitySold: List<int>.from(map['quantitySold'] ?? []),
+      totalQuantitySold: map['totalQuantitySold'] ?? 0,
       createdAt:
           DateTime.parse(map['createdAt'] ?? DateTime.now().toIso8601String()),
       lastUpdated: DateTime.parse(
@@ -60,6 +64,7 @@ class Bag {
       'colors': colors,
       'quantity': quantity,
       'quantitySold': quantitySold,
+      'totalQuantitySold': totalQuantitySold,
       'createdAt': createdAt.toIso8601String(),
       'lastUpdated': lastUpdated.toIso8601String(),
     };
@@ -72,7 +77,8 @@ class Bag {
     String? garment,
     List<String>? colors,
     List<int>? quantity,
-    int? quantitySold,
+    List<int>? quantitySold,
+    int? totalQuantitySold,
     DateTime? createdAt,
     DateTime? lastUpdated,
   }) {
@@ -83,6 +89,7 @@ class Bag {
       colors: colors ?? this.colors,
       quantity: quantity ?? this.quantity,
       quantitySold: quantitySold ?? this.quantitySold,
+      totalQuantitySold: totalQuantitySold ?? this.totalQuantitySold,
       createdAt: createdAt ?? this.createdAt,
       lastUpdated: lastUpdated ?? this.lastUpdated,
     );

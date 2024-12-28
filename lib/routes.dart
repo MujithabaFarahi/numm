@@ -4,10 +4,19 @@ import 'package:nummlk/screens/layout_screen.dart';
 import 'package:nummlk/screens/login_screen.dart';
 import 'package:nummlk/screens/splash_screen.dart';
 import 'package:nummlk/screens/update_item.dart';
+import 'package:nummlk/screens/view_item.dart';
 
 class AppRouter {
   Route onGenerateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
+      case '/viewItem':
+        final args = routeSettings.arguments as Map<String, dynamic>?;
+        return _createRoute(
+          ViewItem(
+            bagId: args?['bagId'],
+          ),
+        );
+
       case '/updateItem':
         final args = routeSettings.arguments as Map<String, dynamic>?;
         return _createRoute(

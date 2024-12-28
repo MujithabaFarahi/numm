@@ -93,13 +93,13 @@ class _LayoutScreenState extends State<LayoutScreen> {
             BottomNavigationBarItem(
               icon: _selectedIndex == 3
                   ? const ImageIconBuilder(
-                      image: 'assets/icons/order.png',
+                      image: 'assets/icons/more-outline.png',
                       isSelected: true,
                     )
                   : const ImageIconBuilder(
-                      image: 'assets/icons/order-outline.png',
+                      image: 'assets/icons/more.png',
                     ),
-              label: 'View',
+              label: 'more',
             ),
           ],
           currentIndex: _selectedIndex,

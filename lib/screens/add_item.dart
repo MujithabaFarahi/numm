@@ -178,13 +178,33 @@ class _AddItemState extends State<AddItem> {
                                       _availableQuantity[selectedIndex!] =
                                           quantity;
 
-                                      _updateQuantity(1);
+                                      _availableColors[selectedIndex!] =
+                                          _colorController.text;
 
+                                      _updateQuantity(1);
+                                      _colorController.clear();
                                       setState(() {
                                         selectedIndex = null;
                                       });
                                     }
                                   : () {
+                                      final newQuantity = int.tryParse(
+                                          _quantityController.text);
+
+                                      if (newQuantity == null ||
+                                          newQuantity < 1) {
+                                        CustomToast.show(
+                                            "Please enter a positive quantity",
+                                            bgColor: Colors.red);
+                                        return;
+                                      }
+
+                                      if (_colorController.text.isEmpty) {
+                                        CustomToast.show("Please enter a color",
+                                            bgColor: Colors.red);
+                                        return;
+                                      }
+
                                       final newColor = _colorController.text
                                               .trim()
                                               .split(' ')
@@ -198,8 +218,6 @@ class _AddItemState extends State<AddItem> {
                                               .map((word) => word.toLowerCase())
                                               .join('')
                                               .substring(1);
-                                      final newQuantity = int.tryParse(
-                                          _quantityController.text);
 
                                       if (newColor.isNotEmpty) {
                                         if (!_availableColors
@@ -211,27 +229,11 @@ class _AddItemState extends State<AddItem> {
                                             _updateQuantity(1);
                                           });
                                         } else {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                  '$newColor is already added'),
-                                              duration:
-                                                  const Duration(seconds: 1),
-                                              backgroundColor: Colors.red,
-                                            ),
-                                          );
+                                          CustomToast.show(
+                                              '$newColor is already added',
+                                              bgColor: Colors.red);
+                                          return;
                                         }
-                                      } else {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content:
-                                                Text('Please enter a color'),
-                                            duration: Duration(seconds: 1),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
                                       }
                                     },
                               width: 120,
@@ -287,6 +289,11 @@ class _AddItemState extends State<AddItem> {
                                   onTap: () {
                                     setState(() {
                                       selectedIndex = index;
+                                      _colorController.text =
+                                          _availableColors[index];
+
+                                      _updateQuantity(
+                                          _availableQuantity[index]!);
                                     });
                                   },
                                   child: Padding(
@@ -341,15 +348,9 @@ class _AddItemState extends State<AddItem> {
                   PrimaryButton(
                     isLoading: isLoading,
                     onPressed: () async {
-                      setState(() {
-                        isLoading = true;
-                      });
                       if (_bagController.text.isEmpty) {
                         CustomToast.show("Bag name cannot be empty",
                             bgColor: Colors.red);
-                        setState(() {
-                          isLoading = false;
-                        });
                         return;
                       }
 
@@ -357,50 +358,66 @@ class _AddItemState extends State<AddItem> {
                           _selectedGarment!.isEmpty) {
                         CustomToast.show("Please select a garment",
                             bgColor: Colors.red);
-                        setState(() {
-                          isLoading = false;
-                        });
                         return;
                       }
 
                       if (_availableColors.isEmpty) {
                         CustomToast.show("Please add at least one color",
                             bgColor: Colors.red);
-                        setState(() {
-                          isLoading = false;
-                        });
                         return;
                       }
 
-                      String id = const Uuid().v4();
-
-                      Map<String, dynamic> bagInfoMap = {
-                        "id": id,
-                        "name": _bagController.text,
-                        "garment": _selectedGarment,
-                        "colors": _availableColors,
-                        "quantity": _availableQuantity,
-                        "quantitySold": 0,
-                        "createdAt": DateTime.now().toIso8601String(),
-                        "lastUpdated": DateTime.now().toIso8601String(),
-                      };
-
-                      await DatabaseMethods()
-                          .addItem(bagInfoMap, id)
-                          .then((value) {
-                        CustomToast.show(
-                          "Bag Details added successfully",
-                          bgColor: Colors.green,
-                          textColor: Colors.white,
-                        );
-                      });
-
-                      _bagController.clear();
                       setState(() {
-                        _selectedGarment = null;
-                        _availableColors.clear();
-                        _availableQuantity.clear();
+                        isLoading = true;
                       });
+
+                      String bagName = _bagController.text
+                          .trim()
+                          .split(' ')
+                          .map((word) => word.isNotEmpty
+                              ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+                              : word)
+                          .join(' ');
+
+                      bool isUnique =
+                          await DatabaseMethods().isNameUnique(bagName);
+
+                      if (isUnique) {
+                        String id = const Uuid().v4();
+
+                        Map<String, dynamic> bagInfoMap = {
+                          "id": id,
+                          "name": bagName,
+                          "garment": _selectedGarment,
+                          "colors": _availableColors,
+                          "quantity": _availableQuantity,
+                          "quantitySold": List.generate(
+                              _availableQuantity.length, (index) => 0),
+                          "totalQuantitySold": 0,
+                          "createdAt": DateTime.now().toIso8601String(),
+                          "lastUpdated": DateTime.now().toIso8601String(),
+                        };
+
+                        await DatabaseMethods()
+                            .addItem(bagInfoMap, id)
+                            .then((value) {
+                          CustomToast.show(
+                            "Bag Details added successfully",
+                            bgColor: Colors.green,
+                            textColor: Colors.white,
+                          );
+                        });
+
+                        _bagController.clear();
+                        setState(() {
+                          _selectedGarment = null;
+                          _availableColors.clear();
+                          _availableQuantity.clear();
+                        });
+                      } else {
+                        CustomToast.show("Name already exists",
+                            bgColor: Colors.red);
+                      }
 
                       setState(() {
                         isLoading = false;

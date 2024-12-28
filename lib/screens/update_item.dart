@@ -51,10 +51,6 @@ class _UpdateItemState extends State<UpdateItem> {
       if (docSnapshot.exists) {
         final data = docSnapshot.data() as Map<String, dynamic>;
 
-        print('--------------------------');
-        print(data);
-        print('--------------------------');
-
         setState(() {
           _bagController.text = data['name'] ?? '';
           _selectedGarment = data['garment'];
@@ -211,16 +207,35 @@ class _UpdateItemState extends State<UpdateItem> {
                               onPressed: (selectedIndex != null)
                                   ? () {
                                       _availableQuantity[selectedIndex!] =
-                                          _availableQuantity[selectedIndex!]! +
-                                              quantity;
+                                          quantity;
+
+                                      _availableColors[selectedIndex!] =
+                                          _colorController.text;
 
                                       _updateQuantity(1);
-
+                                      _colorController.clear();
                                       setState(() {
                                         selectedIndex = null;
                                       });
                                     }
                                   : () {
+                                      final newQuantity = int.tryParse(
+                                          _quantityController.text);
+
+                                      if (newQuantity == null ||
+                                          newQuantity < 1) {
+                                        CustomToast.show(
+                                            "Please enter a positive quantity",
+                                            bgColor: Colors.red);
+                                        return;
+                                      }
+
+                                      if (_colorController.text.isEmpty) {
+                                        CustomToast.show("Please enter a color",
+                                            bgColor: Colors.red);
+                                        return;
+                                      }
+
                                       final newColor = _colorController.text
                                               .trim()
                                               .split(' ')
@@ -234,8 +249,6 @@ class _UpdateItemState extends State<UpdateItem> {
                                               .map((word) => word.toLowerCase())
                                               .join('')
                                               .substring(1);
-                                      final newQuantity = int.tryParse(
-                                          _quantityController.text);
 
                                       if (newColor.isNotEmpty) {
                                         if (!_availableColors
@@ -247,27 +260,11 @@ class _UpdateItemState extends State<UpdateItem> {
                                             _updateQuantity(1);
                                           });
                                         } else {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                  '$newColor is already added'),
-                                              duration:
-                                                  const Duration(seconds: 1),
-                                              backgroundColor: Colors.red,
-                                            ),
-                                          );
+                                          CustomToast.show(
+                                              '$newColor is already added',
+                                              bgColor: Colors.red);
+                                          return;
                                         }
-                                      } else {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content:
-                                                Text('Please enter a color'),
-                                            duration: Duration(seconds: 1),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
                                       }
                                     },
                               width: 120,
@@ -322,6 +319,10 @@ class _UpdateItemState extends State<UpdateItem> {
                                   onTap: () {
                                     setState(() {
                                       selectedIndex = index;
+                                      _colorController.text =
+                                          _availableColors[index];
+                                      _updateQuantity(
+                                          _availableQuantity[index]!);
                                     });
                                   },
                                   child: Padding(

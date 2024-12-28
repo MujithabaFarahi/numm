@@ -85,7 +85,6 @@ class _ViewItemsState extends State<ViewItems> {
               height: 12,
             ),
             Expanded(
-              // child: allBagDetails(),
               child:
                   BlocBuilder<ItemBloc, ItemState>(builder: (context, state) {
                 if (state.isLoading && state.bags.isEmpty) {
@@ -99,7 +98,7 @@ class _ViewItemsState extends State<ViewItems> {
                           garment: 'garment',
                           colors: ['Colors', 'Color'],
                           quantities: [0, 0],
-                          quantitySold: 0,
+                          totalQuantitySold: 0,
                         );
                       });
                 } else if (state.bags.isEmpty) {
@@ -110,20 +109,18 @@ class _ViewItemsState extends State<ViewItems> {
                     itemBuilder: (context, index) {
                       Bag ds = state.bags[index];
 
-                      String id = ds.id;
-                      String name = ds.name;
-                      String garment = ds.garment;
-                      int quantitySold = ds.quantitySold;
-                      List<String> colors = ds.colors;
-                      List<int> quantities = ds.quantity;
-
                       return BagCard(
-                        id: id,
-                        name: name,
-                        garment: garment,
-                        colors: colors,
-                        quantities: quantities,
-                        quantitySold: quantitySold,
+                        id: ds.id,
+                        name: ds.name,
+                        garment: ds.garment,
+                        colors: ds.colors,
+                        quantities: ds.quantity,
+                        totalQuantitySold: ds.totalQuantitySold,
+                        onTap: () {
+                          Navigator.pushNamed(context, '/viewItem', arguments: {
+                            'bagId': ds.id,
+                          });
+                        },
                       );
                     },
                   );

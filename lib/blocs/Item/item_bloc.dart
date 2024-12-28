@@ -13,6 +13,7 @@ class ItemBloc extends Bloc<ItemEvent, ItemState> {
 
   ItemBloc(this.databaseMethods) : super(const ItemState()) {
     on<GetAllItems>(_onGetAllItems);
+    on<GetItemById>(_onGetItemById);
     on<SearchItems>(_onSearchItems);
     on<SortByGarment>(_onSortByGarment);
   }
@@ -23,13 +24,36 @@ class ItemBloc extends Bloc<ItemEvent, ItemState> {
       emit(state.copyWith(isLoading: true, isError: false, message: null));
 
       final query = databaseMethods.getAllItems();
+
       await for (final querySnapshot in query) {
         final bags = querySnapshot.docs.map((doc) {
           final data = doc.data() as Map<String, dynamic>;
+
           return Bag.fromMap(data);
         }).toList();
 
         emit(state.copyWith(isLoading: false, bags: bags));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        isError: true,
+        message: e.toString(),
+      ));
+    }
+  }
+
+  FutureOr<void> _onGetItemById(
+      GetItemById event, Emitter<ItemState> emit) async {
+    try {
+      emit(state.copyWith(isLoading: true, isError: false, message: null));
+
+      final query = databaseMethods.getItemById(event.id);
+
+      await for (final documentSnapshot in query) {
+        final data = documentSnapshot.data();
+        final bag = Bag.fromMap(data!);
+        emit(state.copyWith(isLoading: false, bag: bag));
       }
     } catch (e) {
       emit(state.copyWith(
