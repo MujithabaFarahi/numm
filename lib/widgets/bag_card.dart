@@ -103,7 +103,10 @@ class BagCard extends StatelessWidget {
                       "id": id,
                     });
                   },
-                  icon: const Icon(Icons.edit),
+                  icon: const Icon(
+                    Icons.edit,
+                    size: 20,
+                  ),
                 ),
               ],
             ),

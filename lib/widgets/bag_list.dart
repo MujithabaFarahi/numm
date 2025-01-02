@@ -6,7 +6,9 @@ class BagList extends StatelessWidget {
   final String name;
   final String id;
   final String garment;
+  final String dealer;
   final bool isLoading;
+  final bool? isDaraz;
   final VoidCallback? onTap;
 
   const BagList({
@@ -14,7 +16,9 @@ class BagList extends StatelessWidget {
     required this.name,
     required this.id,
     required this.garment,
+    this.dealer = '',
     this.isLoading = false,
+    this.isDaraz,
     this.onTap,
   });
 
@@ -44,14 +48,30 @@ class BagList extends StatelessWidget {
                     child: Text(
                       name,
                       style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold),
+                          fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                   ),
+                  if (isDaraz != null)
+                    isDaraz!
+                        ? const Text(
+                            "Daraz",
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        : Text(
+                            dealer,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   SizedBox(
                     child: Text(
                       garment[0],
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

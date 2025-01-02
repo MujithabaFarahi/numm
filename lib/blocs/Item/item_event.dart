@@ -39,3 +39,26 @@ final class SortByGarment extends ItemEvent {
   @override
   List<Object?> get props => [garment];
 }
+
+final class GetAllOrders extends ItemEvent {
+  const GetAllOrders();
+
+  @override
+  List<Object?> get props => [];
+}
+
+final class GetOrderById extends ItemEvent {
+  final String id;
+
+  const GetOrderById(this.id);
+
+  @override
+  List<Object?> get props => [id];
+}
+
+final class GetAllUsers extends ItemEvent {
+  const GetAllUsers();
+
+  @override
+  List<Object?> get props => [];
+}

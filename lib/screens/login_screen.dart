@@ -41,10 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       await _firestore.collection('Users').doc(userCredential.user!.uid).set({
-        'name': userCredential.user!.displayName ?? '',
         'email': userCredential.user!.email ?? '',
-        'role': 'employee',
-        'itemsProcessed': 0,
       });
 
       await _navigateToHome(userCredential.user!);
@@ -80,15 +77,29 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (!userSnapshot.exists) {
       await userDoc.set({
-        'name': user.displayName ?? '',
         'email': user.email ?? '',
-        'role': 'employee',
-        'itemsProcessed': 0,
       });
     }
 
     if (mounted) {
       Navigator.pushReplacementNamed(context, '/home');
+    }
+  }
+
+  Future<void> _resetPassword() async {
+    if (_emailController.text.trim().isEmpty) {
+      _showError("Please enter your email address to reset your password.");
+      return;
+    }
+
+    try {
+      await _auth.sendPasswordResetEmail(email: _emailController.text.trim());
+      CustomToast.show(
+        "Password reset email has been sent. Please check your inbox.",
+        bgColor: Colors.green,
+      );
+    } catch (e) {
+      _showError("Password reset failed: $e");
     }
   }
 

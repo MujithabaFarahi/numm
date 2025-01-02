@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:nummlk/Models/bag_model.dart';
+import 'package:nummlk/Models/order_model.dart';
+import 'package:nummlk/Models/user_model.dart';
 import 'package:nummlk/service/database.dart';
 
 part 'item_event.dart';
@@ -16,6 +18,9 @@ class ItemBloc extends Bloc<ItemEvent, ItemState> {
     on<GetItemById>(_onGetItemById);
     on<SearchItems>(_onSearchItems);
     on<SortByGarment>(_onSortByGarment);
+    on<GetOrderById>(_onGetOrderById);
+    on<GetAllOrders>(_onGetAllOrders);
+    on<GetAllUsers>(_onGetAllUsers);
   }
 
   FutureOr<void> _onGetAllItems(
@@ -110,6 +115,76 @@ class ItemBloc extends Bloc<ItemEvent, ItemState> {
 
           emit(state.copyWith(isLoading: false, bags: bags));
         }
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        isError: true,
+        message: e.toString(),
+      ));
+    }
+  }
+
+  FutureOr<void> _onGetOrderById(
+      GetOrderById event, Emitter<ItemState> emit) async {
+    try {
+      emit(state.copyWith(isLoading: true, isError: false, message: null));
+
+      final query = databaseMethods.getOrderById(event.id);
+
+      await for (final documentSnapshot in query) {
+        final data = documentSnapshot.data();
+        final order = BagOrder.fromMap(data!);
+        emit(state.copyWith(isLoading: false, order: order));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        isError: true,
+        message: e.toString(),
+      ));
+    }
+  }
+
+  FutureOr<void> _onGetAllOrders(
+      GetAllOrders event, Emitter<ItemState> emit) async {
+    try {
+      emit(state.copyWith(isLoading: true, isError: false, message: null));
+
+      final query = databaseMethods.getAllOrders();
+
+      await for (final querySnapshot in query) {
+        final orders = querySnapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          return BagOrder.fromMap(data);
+        }).toList();
+
+        emit(state.copyWith(isLoading: false, orders: orders));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        isError: true,
+        message: e.toString(),
+      ));
+    }
+  }
+
+  FutureOr<void> _onGetAllUsers(
+      GetAllUsers event, Emitter<ItemState> emit) async {
+    try {
+      emit(state.copyWith(isLoading: true, isError: false, message: null));
+
+      final query = databaseMethods.getAllUsers();
+
+      await for (final querySnapshot in query) {
+        final users = querySnapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+
+          return User.fromMap(data);
+        }).toList();
+
+        emit(state.copyWith(isLoading: false, users: users));
       }
     } catch (e) {
       emit(state.copyWith(

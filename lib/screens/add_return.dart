@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nummlk/Models/bag_model.dart';
@@ -10,20 +11,19 @@ import 'package:nummlk/widgets/custom_toast.dart';
 import 'package:nummlk/widgets/primary_button.dart';
 import 'package:nummlk/widgets/search_bar.dart';
 
-class AddOrder extends StatefulWidget {
-  const AddOrder({super.key});
+class AddReturn extends StatefulWidget {
+  const AddReturn({super.key});
 
   @override
-  State<AddOrder> createState() => _AddOrderState();
+  State<AddReturn> createState() => _AddReturnState();
 }
 
-class _AddOrderState extends State<AddOrder> {
+class _AddReturnState extends State<AddReturn> {
   final List<String> _dropdownOptions = ['All', 'Lulu', 'Naleem', 'Akram'];
   String? selectedBagId;
   String? selectedBagName;
   String? selectedColor;
   int quantity = 1;
-  int maxQuantity = 100;
   List<Bag> bags = [];
 
   final Map<String, Map<String, int>> cart = {};
@@ -32,7 +32,6 @@ class _AddOrderState extends State<AddOrder> {
   void initState() {
     super.initState();
     final itemBloc = BlocProvider.of<ItemBloc>(context);
-    itemBloc.add(const GetAllUsers());
     itemBloc.add(const GetAllItems());
   }
 
@@ -54,6 +53,7 @@ class _AddOrderState extends State<AddOrder> {
       selectedColor = null;
       quantity = 1;
     });
+
     CustomToast.show(
       '$bagName added to order',
     );
@@ -96,7 +96,8 @@ class _AddOrderState extends State<AddOrder> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(
-        title: 'Add Order',
+        title: 'Add Return',
+        showBackButton: true,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
@@ -183,7 +184,6 @@ class _AddOrderState extends State<AddOrder> {
                       setState(() {
                         selectedBagId = null;
                         selectedBagName = null;
-                        selectedColor = null;
                       });
                     },
                     height: 25,
@@ -207,22 +207,7 @@ class _AddOrderState extends State<AddOrder> {
                 onChanged: (value) {
                   setState(() {
                     selectedColor = value;
-
-                    final selectedBag =
-                        bags.firstWhere((bag) => bag.id == selectedBagId!);
-                    final colorIndex =
-                        selectedBag.colors.indexOf(selectedColor!);
-                    maxQuantity = selectedBag.quantity[colorIndex];
-                    if (maxQuantity < 1) {
-                      CustomToast.show(
-                        '$selectedColor of $selectedBagName is out of stock',
-                        bgColor: ColorPalette.negativeColor[500]!,
-                      );
-
-                      setState(() {
-                        selectedColor = null;
-                      });
-                    }
+                    quantity = 1;
                   });
                 },
               ),
@@ -242,11 +227,9 @@ class _AddOrderState extends State<AddOrder> {
                   Text('$quantity', style: const TextStyle(fontSize: 18)),
                   IconButton(
                     onPressed: () {
-                      if (quantity < maxQuantity) {
-                        setState(() {
-                          quantity++;
-                        });
-                      }
+                      setState(() {
+                        quantity++;
+                      });
                     },
                     icon: const Icon(Icons.add),
                   ),
@@ -343,122 +326,117 @@ class _AddOrderState extends State<AddOrder> {
             if (cart.isNotEmpty)
               PrimaryButton(
                 onPressed: () async {
-                  Navigator.pushNamed(context, '/confirm', arguments: {
-                    'cart': cart,
+                  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+                  await firestore.runTransaction((transaction) async {
+                    // Step 1: Read all necessary data first
+                    Map<String, Map<String, dynamic>> bagsData =
+                        {}; // Store all bag data
+
+                    for (String bagId in cart.keys) {
+                      final bagRef = firestore.collection('Bags').doc(bagId);
+
+                      final bagSnapshot = await transaction.get(bagRef);
+
+                      if (!bagSnapshot.exists) {
+                        throw Exception('Bag does not exist');
+                      }
+
+                      bagsData[bagId] =
+                          bagSnapshot.data() as Map<String, dynamic>;
+                    }
+
+                    // Step 2: Process the data
+                    Map<String, Map<String, dynamic>> updatedBagsData = {};
+
+                    for (String bagId in cart.keys) {
+                      Map<String, dynamic> bagData = bagsData[bagId]!;
+                      List<String> colors =
+                          List<String>.from(bagData['colors']);
+                      List<int> quantities =
+                          List<int>.from(bagData['quantity']);
+                      List<int> quantitySold =
+                          List<int>.from(bagData['quantitySold']);
+
+                      int totalQuantitySold = bagData['totalQuantitySold'];
+
+                      for (var entry in cart[bagId]!.entries) {
+                        String color = entry.key;
+                        int orderQuantity = entry.value;
+                        int colorIndex = colors.indexOf(color);
+
+                        if (colorIndex == -1) {
+                          throw Exception('Color not found in bag');
+                        }
+
+                        if (quantities[colorIndex] < orderQuantity) {
+                          throw Exception('Insufficient stock for $color');
+                        }
+
+                        // Deduct quantity and update sold count
+                        quantities[colorIndex] += orderQuantity;
+                        quantitySold[colorIndex] -= orderQuantity;
+                        totalQuantitySold -= orderQuantity;
+                      }
+
+                      updatedBagsData[bagId] = {
+                        "quantity": quantities,
+                        "totalQuantitySold": totalQuantitySold,
+                        "quantitySold": quantitySold,
+                      };
+                    }
+
+                    // Step 3: Perform all writes after processing
+                    for (String bagId in updatedBagsData.keys) {
+                      final bagRef = firestore.collection('Bags').doc(bagId);
+
+                      transaction.update(bagRef, updatedBagsData[bagId]!);
+                    }
+
+                    // Step 4: Create the order
+                    String returnId =
+                        DateTime.now().millisecondsSinceEpoch.toString();
+
+                    Map<String, dynamic> orderMap = {
+                      "returnId": returnId,
+                      "bags": cart.entries
+                          .map((entry) {
+                            return entry.value.entries.map((colorEntry) {
+                              return {
+                                "bagId": entry.key,
+                                "color": colorEntry.key,
+                                "quantity": colorEntry.value,
+                              };
+                            }).toList();
+                          })
+                          .expand((x) => x)
+                          .toList(),
+                      "createdAt": DateTime.now().toIso8601String(),
+                    };
+
+                    final orderRef =
+                        firestore.collection('Returns').doc(returnId);
+
+                    transaction.set(orderRef, orderMap);
+                  }).then((_) {
+                    CustomToast.show(
+                      'Return added successfully',
+                    );
+
+                    setState(() {
+                      cart.clear();
+                    });
+                  }).catchError((error) {
+                    CustomToast.show(
+                      'Error: $error',
+                      bgColor: Colors.red,
+                    );
                   });
-                  // FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-                  // await firestore.runTransaction((transaction) async {
-                  //   // Step 1: Read all necessary data first
-                  //   Map<String, Map<String, dynamic>> bagsData =
-                  //       {}; // Store all bag data
-
-                  //   for (String bagId in cart.keys) {
-                  //     final bagRef = firestore.collection('Bags').doc(bagId);
-
-                  //     final bagSnapshot = await transaction.get(bagRef);
-
-                  //     if (!bagSnapshot.exists) {
-                  //       throw Exception('Bag does not exist');
-                  //     }
-
-                  //     bagsData[bagId] =
-                  //         bagSnapshot.data() as Map<String, dynamic>;
-                  //   }
-
-                  //   // Step 2: Process the data
-                  //   Map<String, Map<String, dynamic>> updatedBagsData = {};
-
-                  //   for (String bagId in cart.keys) {
-                  //     Map<String, dynamic> bagData = bagsData[bagId]!;
-                  //     List<String> colors =
-                  //         List<String>.from(bagData['colors']);
-                  //     List<int> quantities =
-                  //         List<int>.from(bagData['quantity']);
-                  //     List<int> quantitySold =
-                  //         List<int>.from(bagData['quantitySold']);
-
-                  //     int totalQuantitySold = bagData['totalQuantitySold'];
-
-                  //     for (var entry in cart[bagId]!.entries) {
-                  //       String color = entry.key;
-                  //       int orderQuantity = entry.value;
-                  //       int colorIndex = colors.indexOf(color);
-
-                  //       if (colorIndex == -1) {
-                  //         throw Exception('Color not found in bag');
-                  //       }
-
-                  //       if (quantities[colorIndex] < orderQuantity) {
-                  //         throw Exception('Insufficient stock for $color');
-                  //       }
-
-                  //       // Deduct quantity and update sold count
-                  //       quantities[colorIndex] -= orderQuantity;
-                  //       quantitySold[colorIndex] += orderQuantity;
-                  //       totalQuantitySold += orderQuantity;
-                  //     }
-
-                  //     updatedBagsData[bagId] = {
-                  //       "quantity": quantities,
-                  //       "totalQuantitySold": totalQuantitySold,
-                  //       "quantitySold": quantitySold,
-                  //     };
-                  //   }
-
-                  //   // Step 3: Perform all writes after processing
-                  //   for (String bagId in updatedBagsData.keys) {
-                  //     final bagRef = firestore.collection('Bags').doc(bagId);
-
-                  //     transaction.update(bagRef, updatedBagsData[bagId]!);
-                  //   }
-
-                  //   // Step 4: Create the order
-                  //   String orderId =
-                  //       DateTime.now().millisecondsSinceEpoch.toString();
-
-                  //   Map<String, dynamic> orderMap = {
-                  //     "orderId": orderId,
-                  //     "bags": cart.entries
-                  //         .map((entry) {
-                  //           return entry.value.entries.map((colorEntry) {
-                  //             return {
-                  //               "bagId": entry.key,
-                  //               "color": colorEntry.key,
-                  //               "quantity": colorEntry.value,
-                  //             };
-                  //           }).toList();
-                  //         })
-                  //         .expand((x) => x)
-                  //         .toList(),
-                  //     "status": "Pending",
-                  //     "totalItems": getTotalQuantity(),
-                  //     "createdAt": DateTime.now().toIso8601String(),
-                  //   };
-
-                  //   final orderRef =
-                  //       firestore.collection('Orders').doc(orderId);
-
-                  //   transaction.set(orderRef, orderMap);
-                  // }).then((_) {
-                  //   CustomToast.show(
-                  //     'Order placed successfully',
-                  //     duration: 2,
-                  //   );
-
-                  //   setState(() {
-                  //     cart.clear();
-                  //     selectedBagId = null;
-                  //     selectedBagName = null;
-                  //   });
-                  // }).catchError((error) {
-                  //   CustomToast.show(
-                  //     'Error: $error',
-                  //     bgColor: ColorPalette.negativeColor[400]!,
-                  //   );
-                  // });
+                  if (mounted) {
+                    Navigator.pop(context);
+                  }
                 },
-                text: 'Next',
+                text: 'Place Order',
               ),
           ],
         ),

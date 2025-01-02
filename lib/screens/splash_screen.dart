@@ -37,10 +37,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (!userSnapshot.exists) {
       await userDoc.set({
-        'name': user.displayName ?? '',
         'email': user.email ?? '',
-        'role': 'employee',
-        'itemsProcessed': 0,
       });
     }
 
@@ -57,24 +54,11 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorPalette.white,
-      body: Stack(
-        children: [
-          Expanded(
-            child: Image.asset(
-              'assets/images/splashbg.png',
-              color: ColorPalette.mainBlue[100],
-              fit: BoxFit.cover,
-              height: MediaQuery.of(context).size.height,
-            ),
-          ),
-          Center(
-            child: Image.asset(
-              'assets/images/logo.png',
-              width: 150,
-            ),
-            // ),
-          ),
-        ],
+      body: Center(
+        child: Image.asset(
+          'assets/images/logo.png',
+          width: 150,
+        ),
       ),
     );
   }

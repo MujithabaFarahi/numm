@@ -1,19 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:nummlk/screens/add_bag.dart';
 import 'package:nummlk/screens/add_item.dart';
+import 'package:nummlk/screens/add_return.dart';
+import 'package:nummlk/screens/confirm_order.dart';
 import 'package:nummlk/screens/layout_screen.dart';
 import 'package:nummlk/screens/login_screen.dart';
 import 'package:nummlk/screens/splash_screen.dart';
 import 'package:nummlk/screens/update_item.dart';
 import 'package:nummlk/screens/view_item.dart';
+import 'package:nummlk/screens/view_order.dart';
+import 'package:nummlk/screens/view_orders.dart';
 
 class AppRouter {
   Route onGenerateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
+      case '/addBag':
+        return _createRoute(
+          const AddBag(),
+        );
+
+      case '/viewOrder':
+        final args = routeSettings.arguments as Map<String, dynamic>?;
+        return _createRoute(
+          ViewOrder(
+            orderId: args?['orderId'],
+          ),
+        );
+
+      case '/confirm':
+        final args = routeSettings.arguments as Map<String, dynamic>?;
+        return _createRoute(
+          ConfirmOrder(
+            cart: args?['cart'],
+          ),
+        );
+
+      case '/orders':
+        return _createRoute(
+          const ViewOrders(),
+        );
+
+      case '/addreturn':
+        return _createRoute(
+          const AddReturn(),
+        );
+
       case '/viewItem':
         final args = routeSettings.arguments as Map<String, dynamic>?;
         return _createRoute(
           ViewItem(
             bagId: args?['bagId'],
+            title: args?['title'],
           ),
         );
 
@@ -56,7 +93,7 @@ class AppRouter {
           ),
         );
 
-      case '/view':
+      case '/more':
         return _createRoute(
           const LayoutScreen(
             pageIndex: 3,

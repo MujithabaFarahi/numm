@@ -50,4 +50,23 @@ class DatabaseMethods {
         .doc(id)
         .set(orderInfoMap);
   }
+
+  Stream<QuerySnapshot> getAllOrders() {
+    return FirebaseFirestore.instance
+        .collection("Orders")
+        .snapshots(includeMetadataChanges: true);
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getOrderById(String id) {
+    return FirebaseFirestore.instance
+        .collection("Orders")
+        .doc(id)
+        .snapshots(includeMetadataChanges: true);
+  }
+
+  Stream<QuerySnapshot> getAllUsers() {
+    return FirebaseFirestore.instance
+        .collection("Users")
+        .snapshots(includeMetadataChanges: true);
+  }
 }

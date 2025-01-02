@@ -6,6 +6,10 @@ class ItemState extends Equatable {
   final String? message;
   final List<Bag> bags;
   final Bag? bag;
+  final BagOrder? order;
+  final List<BagOrder> orders;
+  final User? user;
+  final List<User> users;
 
   const ItemState({
     this.isLoading = false,
@@ -13,6 +17,10 @@ class ItemState extends Equatable {
     this.message,
     this.bags = const [],
     this.bag,
+    this.order,
+    this.orders = const [],
+    this.user,
+    this.users = const [],
   });
 
   ItemState copyWith({
@@ -21,6 +29,10 @@ class ItemState extends Equatable {
     String? message,
     List<Bag>? bags,
     Bag? bag,
+    BagOrder? order,
+    List<BagOrder>? orders,
+    User? user,
+    List<User>? users,
   }) {
     return ItemState(
       isLoading: isLoading ?? this.isLoading,
@@ -28,6 +40,10 @@ class ItemState extends Equatable {
       message: message ?? this.message,
       bags: bags ?? this.bags,
       bag: bag ?? this.bag,
+      order: order ?? this.order,
+      orders: orders ?? this.orders,
+      user: user ?? this.user,
+      users: users ?? this.users,
     );
   }
 
@@ -38,5 +54,9 @@ class ItemState extends Equatable {
         isError,
         bags,
         bag,
+        order,
+        orders,
+        user,
+        users,
       ];
 }

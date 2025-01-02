@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nummlk/screens/view_items.dart';
 import 'package:nummlk/screens/add_order.dart';
 import 'package:nummlk/screens/home_screen.dart';
-import 'package:nummlk/screens/view_sales.dart';
+import 'package:nummlk/screens/more_screen.dart';
 import 'package:nummlk/theme/color_pallette.dart';
 import 'package:nummlk/widgets/image_icon_builder.dart';
 
@@ -48,7 +48,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
           HomeScreen(),
           ViewItems(),
           AddOrder(),
-          ViewSales(),
+          MoreScreen(),
         ],
       ),
       bottomNavigationBar: Padding(

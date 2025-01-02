@@ -68,17 +68,22 @@ class _ViewItemsState extends State<ViewItems> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CustomSearchBar(
-              onFilterTap: () {
-                _showOptions(context, _dropdownOptions);
-              },
-              onSearch: (query) {
-                final itemBloc = BlocProvider.of<ItemBloc>(context);
-                itemBloc.add(SearchItems(query));
+            BlocBuilder<ItemBloc, ItemState>(
+              builder: (context, state) {
+                return CustomSearchBar(
+                  isLoading: state.isLoading,
+                  onFilterTap: () {
+                    _showOptions(context, _dropdownOptions);
+                  },
+                  onSearch: (query) {
+                    final itemBloc = BlocProvider.of<ItemBloc>(context);
+                    itemBloc.add(SearchItems(query));
+                  },
+                );
               },
             ),
             const SizedBox(
@@ -119,6 +124,7 @@ class _ViewItemsState extends State<ViewItems> {
                         onTap: () {
                           Navigator.pushNamed(context, '/viewItem', arguments: {
                             'bagId': ds.id,
+                            'title': ds.name,
                           });
                         },
                       );

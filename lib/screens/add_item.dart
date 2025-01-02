@@ -17,42 +17,42 @@ class AddItem extends StatefulWidget {
 
 class _AddItemState extends State<AddItem> {
   String? _selectedGarment;
-  int quantity = 1;
+  // int quantity = 1;
   final List<String> _dropdownOptions = ['Lulu', 'Naleem', 'Akram'];
   final List<String> _availableColors = [];
-  final List<int?> _availableQuantity = [];
+  // final List<int?> _availableQuantity = [];
   int? selectedIndex;
   bool isLoading = false;
 
   final TextEditingController _colorController = TextEditingController();
   final TextEditingController _bagController = TextEditingController();
-  final TextEditingController _quantityController = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
+  // final TextEditingController _quantityController = TextEditingController();
+  // final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    _quantityController.text = quantity.toString();
+    // _quantityController.text = quantity.toString();
   }
 
   @override
   void dispose() {
     _colorController.dispose();
     _bagController.dispose();
-    _quantityController.dispose();
-    _focusNode.dispose();
+    // _quantityController.dispose();
+    // _focusNode.dispose();
     super.dispose();
   }
 
-  void _updateQuantity(int newQuantity) {
-    if (newQuantity >= 1) {
-      setState(() {
-        quantity = newQuantity;
-        _quantityController.text = newQuantity.toString();
-      });
-      _focusNode.unfocus();
-    }
-  }
+  // void _updateQuantity(int newQuantity) {
+  //   if (newQuantity >= 1) {
+  //     setState(() {
+  //       quantity = newQuantity;
+  //       _quantityController.text = newQuantity.toString();
+  //     });
+  //     _focusNode.unfocus();
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -110,44 +110,44 @@ class _AddItemState extends State<AddItem> {
                               controller: _colorController,
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          SizedBox(
-                            child: Row(
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    if (quantity > 1) {
-                                      _updateQuantity(quantity - 1);
-                                    }
-                                  },
-                                  icon: const Icon(Icons.remove),
-                                ),
-                                SizedBox(
-                                  width: 60,
-                                  child: PrimaryTextfield(
-                                      focusNode: _focusNode,
-                                      textAlign: TextAlign.center,
-                                      keyboardType: TextInputType.number,
-                                      hintText: 'Quantity',
-                                      controller: _quantityController,
-                                      onChanged: (value) {
-                                        final int? newQuantity =
-                                            int.tryParse(value);
-                                        if (newQuantity != null &&
-                                            newQuantity >= 1) {
-                                          quantity = newQuantity;
-                                        }
-                                      }),
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    _updateQuantity(quantity + 1);
-                                  },
-                                  icon: const Icon(Icons.add),
-                                ),
-                              ],
-                            ),
-                          ),
+                          // const SizedBox(width: 10),
+                          // SizedBox(
+                          //   child: Row(
+                          //     children: [
+                          //       IconButton(
+                          //         onPressed: () {
+                          //           if (quantity > 1) {
+                          //             _updateQuantity(quantity - 1);
+                          //           }
+                          //         },
+                          //         icon: const Icon(Icons.remove),
+                          //       ),
+                          //       SizedBox(
+                          //         width: 60,
+                          //         child: PrimaryTextfield(
+                          //             focusNode: _focusNode,
+                          //             textAlign: TextAlign.center,
+                          //             keyboardType: TextInputType.number,
+                          //             hintText: 'Quantity',
+                          //             controller: _quantityController,
+                          //             onChanged: (value) {
+                          //               final int? newQuantity =
+                          //                   int.tryParse(value);
+                          //               if (newQuantity != null &&
+                          //                   newQuantity >= 1) {
+                          //                 quantity = newQuantity;
+                          //               }
+                          //             }),
+                          //       ),
+                          //       IconButton(
+                          //         onPressed: () {
+                          //           _updateQuantity(quantity + 1);
+                          //         },
+                          //         icon: const Icon(Icons.add),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -175,29 +175,29 @@ class _AddItemState extends State<AddItem> {
                               text: "Add",
                               onPressed: (selectedIndex != null)
                                   ? () {
-                                      _availableQuantity[selectedIndex!] =
-                                          quantity;
+                                      // _availableQuantity[selectedIndex!] =
+                                      //     quantity;
 
                                       _availableColors[selectedIndex!] =
                                           _colorController.text;
 
-                                      _updateQuantity(1);
+                                      // _updateQuantity(1);
                                       _colorController.clear();
                                       setState(() {
                                         selectedIndex = null;
                                       });
                                     }
                                   : () {
-                                      final newQuantity = int.tryParse(
-                                          _quantityController.text);
+                                      // final newQuantity = int.tryParse(
+                                      //     _quantityController.text);
 
-                                      if (newQuantity == null ||
-                                          newQuantity < 1) {
-                                        CustomToast.show(
-                                            "Please enter a positive quantity",
-                                            bgColor: Colors.red);
-                                        return;
-                                      }
+                                      // if (newQuantity == null ||
+                                      //     newQuantity < 1) {
+                                      //   CustomToast.show(
+                                      //       "Please enter a positive quantity",
+                                      //       bgColor: Colors.red);
+                                      //   return;
+                                      // }
 
                                       if (_colorController.text.isEmpty) {
                                         CustomToast.show("Please enter a color",
@@ -224,9 +224,9 @@ class _AddItemState extends State<AddItem> {
                                             .contains(newColor)) {
                                           setState(() {
                                             _availableColors.add(newColor);
-                                            _availableQuantity.add(newQuantity);
+                                            // _availableQuantity.add(newQuantity);
                                             _colorController.clear();
-                                            _updateQuantity(1);
+                                            // _updateQuantity(1);
                                           });
                                         } else {
                                           CustomToast.show(
@@ -249,7 +249,7 @@ class _AddItemState extends State<AddItem> {
                             (entry) {
                               final index = entry.key;
                               final color = entry.value;
-                              final quantity = _availableQuantity[index];
+                              // final quantity = _availableQuantity[index];
 
                               return Dismissible(
                                 key: Key(color),
@@ -257,14 +257,12 @@ class _AddItemState extends State<AddItem> {
                                 onDismissed: (direction) {
                                   setState(() {
                                     _availableColors.removeAt(index);
-                                    _availableQuantity.removeAt(index);
+                                    // _availableQuantity.removeAt(index);
                                     selectedIndex = null;
                                   });
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('$color removed'),
-                                      duration: const Duration(seconds: 1),
-                                    ),
+                                  CustomToast.show(
+                                    '$color removed',
+                                    bgColor: Colors.red,
                                   );
                                 },
                                 background: Padding(
@@ -292,8 +290,8 @@ class _AddItemState extends State<AddItem> {
                                       _colorController.text =
                                           _availableColors[index];
 
-                                      _updateQuantity(
-                                          _availableQuantity[index]!);
+                                      // _updateQuantity(
+                                      //     _availableQuantity[index]!);
                                     });
                                   },
                                   child: Padding(
@@ -325,13 +323,13 @@ class _AddItemState extends State<AddItem> {
                                                   fontWeight: FontWeight.w500,
                                                 ),
                                               ),
-                                              Text(
-                                                quantity.toString(),
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
+                                              // Text(
+                                              //   quantity.toString(),
+                                              //   style: const TextStyle(
+                                              //     fontSize: 14,
+                                              //     fontWeight: FontWeight.w500,
+                                              //   ),
+                                              // ),
                                             ],
                                           ),
                                         ),
@@ -390,9 +388,10 @@ class _AddItemState extends State<AddItem> {
                           "name": bagName,
                           "garment": _selectedGarment,
                           "colors": _availableColors,
-                          "quantity": _availableQuantity,
+                          "quantity": List.generate(
+                              _availableColors.length, (index) => 0),
                           "quantitySold": List.generate(
-                              _availableQuantity.length, (index) => 0),
+                              _availableColors.length, (index) => 0),
                           "totalQuantitySold": 0,
                           "createdAt": DateTime.now().toIso8601String(),
                           "lastUpdated": DateTime.now().toIso8601String(),
@@ -412,7 +411,7 @@ class _AddItemState extends State<AddItem> {
                         setState(() {
                           _selectedGarment = null;
                           _availableColors.clear();
-                          _availableQuantity.clear();
+                          // _availableQuantity.clear();
                         });
                       } else {
                         CustomToast.show("Name already exists",
@@ -422,6 +421,9 @@ class _AddItemState extends State<AddItem> {
                       setState(() {
                         isLoading = false;
                       });
+                      if (mounted) {
+                        Navigator.pop(context);
+                      }
                     },
                     text: 'Add Bag',
                   ),

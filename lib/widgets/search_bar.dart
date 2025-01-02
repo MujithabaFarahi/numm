@@ -5,11 +5,13 @@ import 'package:nummlk/widgets/image_icon_builder.dart';
 class CustomSearchBar extends StatelessWidget {
   final Function(String)? onSearch;
   final VoidCallback? onFilterTap;
+  final bool isLoading;
 
   const CustomSearchBar({
     super.key,
     this.onSearch,
     this.onFilterTap,
+    this.isLoading = false,
   });
 
   @override
@@ -31,6 +33,8 @@ class CustomSearchBar extends StatelessWidget {
                 const ImageIconBuilder(
                   image: 'assets/icons/search.png',
                   isOriginal: true,
+                  height: 20,
+                  width: 20,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -62,6 +66,16 @@ class CustomSearchBar extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (isLoading)
+                  SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      color: ColorPalette.mainGray[600],
+                      backgroundColor: ColorPalette.mainGray[100],
+                    ),
+                  ),
               ],
             ),
           ),

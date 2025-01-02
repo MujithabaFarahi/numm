@@ -23,7 +23,7 @@ class UpdateItem extends StatefulWidget {
 class _UpdateItemState extends State<UpdateItem> {
   String? _selectedGarment;
   Stream<DocumentSnapshot>? bag;
-  int quantity = 1;
+  // int quantity = 1;
   List<String> _availableColors = [];
   List<int?> _availableQuantity = [];
   bool isLoading = true;
@@ -31,13 +31,13 @@ class _UpdateItemState extends State<UpdateItem> {
 
   final TextEditingController _colorController = TextEditingController();
   final TextEditingController _bagController = TextEditingController();
-  final TextEditingController _quantityController = TextEditingController();
+  // final TextEditingController _quantityController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    _quantityController.text = quantity.toString();
+    // _quantityController.text = quantity.toString();
     _fetchBagData();
   }
 
@@ -56,7 +56,7 @@ class _UpdateItemState extends State<UpdateItem> {
           _selectedGarment = data['garment'];
           _availableColors = List<String>.from(data['colors'] ?? []);
           _availableQuantity = List<int>.from(data['quantity'] ?? []);
-          _quantityController.text = quantity.toString();
+          // _quantityController.text = quantity.toString();
           isLoading = false;
         });
       } else {
@@ -77,20 +77,20 @@ class _UpdateItemState extends State<UpdateItem> {
   void dispose() {
     _colorController.dispose();
     _bagController.dispose();
-    _quantityController.dispose();
+    // _quantityController.dispose();
     _focusNode.dispose();
     super.dispose();
   }
 
-  void _updateQuantity(int newQuantity) {
-    if (newQuantity >= 1) {
-      setState(() {
-        quantity = newQuantity;
-        _quantityController.text = newQuantity.toString();
-      });
-      _focusNode.unfocus();
-    }
-  }
+  // void _updateQuantity(int newQuantity) {
+  //   if (newQuantity >= 1) {
+  //     setState(() {
+  //       quantity = newQuantity;
+  //       _quantityController.text = newQuantity.toString();
+  //     });
+  //     _focusNode.unfocus();
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -132,44 +132,44 @@ class _UpdateItemState extends State<UpdateItem> {
                               controller: _colorController,
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          SizedBox(
-                            child: Row(
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    if (quantity > 1) {
-                                      _updateQuantity(quantity - 1);
-                                    }
-                                  },
-                                  icon: const Icon(Icons.remove),
-                                ),
-                                SizedBox(
-                                  width: 60,
-                                  child: PrimaryTextfield(
-                                      focusNode: _focusNode,
-                                      textAlign: TextAlign.center,
-                                      keyboardType: TextInputType.number,
-                                      hintText: 'Quantity',
-                                      controller: _quantityController,
-                                      onChanged: (value) {
-                                        final int? newQuantity =
-                                            int.tryParse(value);
-                                        if (newQuantity != null &&
-                                            newQuantity >= 1) {
-                                          quantity = newQuantity;
-                                        }
-                                      }),
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    _updateQuantity(quantity + 1);
-                                  },
-                                  icon: const Icon(Icons.add),
-                                ),
-                              ],
-                            ),
-                          ),
+                          // const SizedBox(width: 10),
+                          // SizedBox(
+                          //   child: Row(
+                          //     children: [
+                          //       IconButton(
+                          //         onPressed: () {
+                          //           if (quantity > 1) {
+                          //             _updateQuantity(quantity - 1);
+                          //           }
+                          //         },
+                          //         icon: const Icon(Icons.remove),
+                          //       ),
+                          //       SizedBox(
+                          //         width: 60,
+                          //         child: PrimaryTextfield(
+                          //             focusNode: _focusNode,
+                          //             textAlign: TextAlign.center,
+                          //             keyboardType: TextInputType.number,
+                          //             hintText: 'Quantity',
+                          //             controller: _quantityController,
+                          //             onChanged: (value) {
+                          //               final int? newQuantity =
+                          //                   int.tryParse(value);
+                          //               if (newQuantity != null &&
+                          //                   newQuantity >= 1) {
+                          //                 quantity = newQuantity;
+                          //               }
+                          //             }),
+                          //       ),
+                          //       IconButton(
+                          //         onPressed: () {
+                          //           _updateQuantity(quantity + 1);
+                          //         },
+                          //         icon: const Icon(Icons.add),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -206,29 +206,29 @@ class _UpdateItemState extends State<UpdateItem> {
                               text: "Add",
                               onPressed: (selectedIndex != null)
                                   ? () {
-                                      _availableQuantity[selectedIndex!] =
-                                          quantity;
+                                      // _availableQuantity[selectedIndex!] =
+                                      //     quantity;
 
                                       _availableColors[selectedIndex!] =
                                           _colorController.text;
 
-                                      _updateQuantity(1);
+                                      // _updateQuantity(1);
                                       _colorController.clear();
                                       setState(() {
                                         selectedIndex = null;
                                       });
                                     }
                                   : () {
-                                      final newQuantity = int.tryParse(
-                                          _quantityController.text);
+                                      // final newQuantity = int.tryParse(
+                                      //     _quantityController.text);
 
-                                      if (newQuantity == null ||
-                                          newQuantity < 1) {
-                                        CustomToast.show(
-                                            "Please enter a positive quantity",
-                                            bgColor: Colors.red);
-                                        return;
-                                      }
+                                      // if (newQuantity == null ||
+                                      //     newQuantity < 1) {
+                                      //   CustomToast.show(
+                                      //       "Please enter a positive quantity",
+                                      //       bgColor: Colors.red);
+                                      //   return;
+                                      // }
 
                                       if (_colorController.text.isEmpty) {
                                         CustomToast.show("Please enter a color",
@@ -255,9 +255,9 @@ class _UpdateItemState extends State<UpdateItem> {
                                             .contains(newColor)) {
                                           setState(() {
                                             _availableColors.add(newColor);
-                                            _availableQuantity.add(newQuantity);
+                                            _availableQuantity.add(0);
                                             _colorController.clear();
-                                            _updateQuantity(1);
+                                            // _updateQuantity(1);
                                           });
                                         } else {
                                           CustomToast.show(
@@ -290,11 +290,9 @@ class _UpdateItemState extends State<UpdateItem> {
                                     _availableColors.removeAt(index);
                                     _availableQuantity.removeAt(index);
                                   });
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('$color removed'),
-                                      duration: const Duration(seconds: 1),
-                                    ),
+                                  CustomToast.show(
+                                    '$color removed',
+                                    bgColor: Colors.red,
                                   );
                                 },
                                 background: Padding(
@@ -321,8 +319,8 @@ class _UpdateItemState extends State<UpdateItem> {
                                       selectedIndex = index;
                                       _colorController.text =
                                           _availableColors[index];
-                                      _updateQuantity(
-                                          _availableQuantity[index]!);
+                                      // _updateQuantity(
+                                      //     _availableQuantity[index]!);
                                     });
                                   },
                                   child: Padding(
@@ -400,9 +398,17 @@ class _UpdateItemState extends State<UpdateItem> {
                         isLoading = true;
                       });
 
+                      String bagName = _bagController.text
+                          .trim()
+                          .split(' ')
+                          .map((word) => word.isNotEmpty
+                              ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+                              : word)
+                          .join(' ');
+
                       Map<String, dynamic> bagInfoMap = {
                         "id": widget.id,
-                        "name": _bagController.text,
+                        "name": bagName,
                         "colors": _availableColors,
                         "quantity": _availableQuantity,
                         "lastUpdated": DateTime.now().toIso8601String(),

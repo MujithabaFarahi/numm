@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nummlk/Models/bag_model.dart';
@@ -8,32 +9,43 @@ import 'package:nummlk/widgets/bag_list.dart';
 import 'package:nummlk/widgets/custom_dropdown.dart';
 import 'package:nummlk/widgets/custom_toast.dart';
 import 'package:nummlk/widgets/primary_button.dart';
+import 'package:nummlk/widgets/primary_textfield.dart';
 import 'package:nummlk/widgets/search_bar.dart';
 
-class AddOrder extends StatefulWidget {
-  const AddOrder({super.key});
+class AddBag extends StatefulWidget {
+  const AddBag({super.key});
 
   @override
-  State<AddOrder> createState() => _AddOrderState();
+  State<AddBag> createState() => _AddBagState();
 }
 
-class _AddOrderState extends State<AddOrder> {
+class _AddBagState extends State<AddBag> {
   final List<String> _dropdownOptions = ['All', 'Lulu', 'Naleem', 'Akram'];
   String? selectedBagId;
   String? selectedBagName;
   String? selectedColor;
   int quantity = 1;
-  int maxQuantity = 100;
   List<Bag> bags = [];
+
+  final TextEditingController _quantityController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   final Map<String, Map<String, int>> cart = {};
 
   @override
   void initState() {
     super.initState();
+    _quantityController.text = quantity.toString();
+
     final itemBloc = BlocProvider.of<ItemBloc>(context);
-    itemBloc.add(const GetAllUsers());
     itemBloc.add(const GetAllItems());
+  }
+
+  @override
+  void dispose() {
+    _quantityController.dispose();
+    _focusNode.dispose();
+    super.dispose();
   }
 
   void _addToCart(String bagName) {
@@ -54,6 +66,7 @@ class _AddOrderState extends State<AddOrder> {
       selectedColor = null;
       quantity = 1;
     });
+
     CustomToast.show(
       '$bagName added to order',
     );
@@ -67,6 +80,16 @@ class _AddOrderState extends State<AddOrder> {
       }
     }
     return total;
+  }
+
+  void _updateQuantity(int newQuantity) {
+    if (newQuantity >= 1) {
+      setState(() {
+        quantity = newQuantity;
+        _quantityController.text = newQuantity.toString();
+      });
+      _focusNode.unfocus();
+    }
   }
 
   void _showOptions(BuildContext context, List<String> options) {
@@ -96,7 +119,8 @@ class _AddOrderState extends State<AddOrder> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(
-        title: 'Add Order',
+        title: 'Add Bags',
+        showBackButton: true,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
@@ -183,7 +207,6 @@ class _AddOrderState extends State<AddOrder> {
                       setState(() {
                         selectedBagId = null;
                         selectedBagName = null;
-                        selectedColor = null;
                       });
                     },
                     height: 25,
@@ -207,50 +230,46 @@ class _AddOrderState extends State<AddOrder> {
                 onChanged: (value) {
                   setState(() {
                     selectedColor = value;
-
-                    final selectedBag =
-                        bags.firstWhere((bag) => bag.id == selectedBagId!);
-                    final colorIndex =
-                        selectedBag.colors.indexOf(selectedColor!);
-                    maxQuantity = selectedBag.quantity[colorIndex];
-                    if (maxQuantity < 1) {
-                      CustomToast.show(
-                        '$selectedColor of $selectedBagName is out of stock',
-                        bgColor: ColorPalette.negativeColor[500]!,
-                      );
-
-                      setState(() {
-                        selectedColor = null;
-                      });
-                    }
+                    quantity = 1;
                   });
                 },
               ),
+            const SizedBox(height: 10),
             if (selectedColor != null)
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      if (quantity > 1) {
-                        setState(() {
-                          quantity--;
-                        });
-                      }
-                    },
-                    icon: const Icon(Icons.remove),
-                  ),
-                  Text('$quantity', style: const TextStyle(fontSize: 18)),
-                  IconButton(
-                    onPressed: () {
-                      if (quantity < maxQuantity) {
-                        setState(() {
-                          quantity++;
-                        });
-                      }
-                    },
-                    icon: const Icon(Icons.add),
-                  ),
-                ],
+              SizedBox(
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        if (quantity > 1) {
+                          _updateQuantity(quantity - 1);
+                        }
+                      },
+                      icon: const Icon(Icons.remove),
+                    ),
+                    SizedBox(
+                      width: 60,
+                      child: PrimaryTextfield(
+                          focusNode: _focusNode,
+                          textAlign: TextAlign.center,
+                          keyboardType: TextInputType.number,
+                          hintText: 'Quantity',
+                          controller: _quantityController,
+                          onChanged: (value) {
+                            final int? newQuantity = int.tryParse(value);
+                            if (newQuantity != null && newQuantity >= 1) {
+                              quantity = newQuantity;
+                            }
+                          }),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        _updateQuantity(quantity + 1);
+                      },
+                      icon: const Icon(Icons.add),
+                    ),
+                  ],
+                ),
               ),
             const SizedBox(height: 16),
             if (selectedColor != null)
@@ -343,122 +362,108 @@ class _AddOrderState extends State<AddOrder> {
             if (cart.isNotEmpty)
               PrimaryButton(
                 onPressed: () async {
-                  Navigator.pushNamed(context, '/confirm', arguments: {
-                    'cart': cart,
+                  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+                  await firestore.runTransaction((transaction) async {
+                    // Step 1: Read all necessary data first
+                    Map<String, Map<String, dynamic>> bagsData =
+                        {}; // Store all bag data
+
+                    for (String bagId in cart.keys) {
+                      final bagRef = firestore.collection('Bags').doc(bagId);
+
+                      final bagSnapshot = await transaction.get(bagRef);
+
+                      if (!bagSnapshot.exists) {
+                        throw Exception('Bag does not exist');
+                      }
+
+                      bagsData[bagId] =
+                          bagSnapshot.data() as Map<String, dynamic>;
+                    }
+
+                    // Step 2: Process the data
+                    Map<String, Map<String, dynamic>> updatedBagsData = {};
+
+                    for (String bagId in cart.keys) {
+                      Map<String, dynamic> bagData = bagsData[bagId]!;
+                      List<String> colors =
+                          List<String>.from(bagData['colors']);
+                      List<int> quantities =
+                          List<int>.from(bagData['quantity']);
+
+                      for (var entry in cart[bagId]!.entries) {
+                        String color = entry.key;
+                        int orderQuantity = entry.value;
+                        int colorIndex = colors.indexOf(color);
+
+                        if (colorIndex == -1) {
+                          throw Exception('Color not found in bag');
+                        }
+
+                        if (quantities[colorIndex] < orderQuantity) {
+                          throw Exception('Insufficient stock for $color');
+                        }
+
+                        quantities[colorIndex] += orderQuantity;
+                      }
+
+                      updatedBagsData[bagId] = {
+                        "quantity": quantities,
+                      };
+                    }
+
+                    // Step 3: Perform all writes after processing
+                    for (String bagId in updatedBagsData.keys) {
+                      final bagRef = firestore.collection('Bags').doc(bagId);
+
+                      transaction.update(bagRef, updatedBagsData[bagId]!);
+                    }
+
+                    // Step 4: Create the order
+                    String returnId =
+                        DateTime.now().millisecondsSinceEpoch.toString();
+
+                    Map<String, dynamic> orderMap = {
+                      "id": returnId,
+                      "bags": cart.entries
+                          .map((entry) {
+                            return entry.value.entries.map((colorEntry) {
+                              return {
+                                "bagId": entry.key,
+                                "color": colorEntry.key,
+                                "quantity": colorEntry.value,
+                              };
+                            }).toList();
+                          })
+                          .expand((x) => x)
+                          .toList(),
+                      "createdAt": DateTime.now().toIso8601String(),
+                    };
+
+                    final orderRef =
+                        firestore.collection('Returns').doc(returnId);
+
+                    transaction.set(orderRef, orderMap);
+                  }).then((_) {
+                    CustomToast.show(
+                      'Bags added successfully',
+                    );
+
+                    setState(() {
+                      cart.clear();
+                    });
+                  }).catchError((error) {
+                    CustomToast.show(
+                      'Error: $error',
+                      bgColor: Colors.red,
+                    );
                   });
-                  // FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-                  // await firestore.runTransaction((transaction) async {
-                  //   // Step 1: Read all necessary data first
-                  //   Map<String, Map<String, dynamic>> bagsData =
-                  //       {}; // Store all bag data
-
-                  //   for (String bagId in cart.keys) {
-                  //     final bagRef = firestore.collection('Bags').doc(bagId);
-
-                  //     final bagSnapshot = await transaction.get(bagRef);
-
-                  //     if (!bagSnapshot.exists) {
-                  //       throw Exception('Bag does not exist');
-                  //     }
-
-                  //     bagsData[bagId] =
-                  //         bagSnapshot.data() as Map<String, dynamic>;
-                  //   }
-
-                  //   // Step 2: Process the data
-                  //   Map<String, Map<String, dynamic>> updatedBagsData = {};
-
-                  //   for (String bagId in cart.keys) {
-                  //     Map<String, dynamic> bagData = bagsData[bagId]!;
-                  //     List<String> colors =
-                  //         List<String>.from(bagData['colors']);
-                  //     List<int> quantities =
-                  //         List<int>.from(bagData['quantity']);
-                  //     List<int> quantitySold =
-                  //         List<int>.from(bagData['quantitySold']);
-
-                  //     int totalQuantitySold = bagData['totalQuantitySold'];
-
-                  //     for (var entry in cart[bagId]!.entries) {
-                  //       String color = entry.key;
-                  //       int orderQuantity = entry.value;
-                  //       int colorIndex = colors.indexOf(color);
-
-                  //       if (colorIndex == -1) {
-                  //         throw Exception('Color not found in bag');
-                  //       }
-
-                  //       if (quantities[colorIndex] < orderQuantity) {
-                  //         throw Exception('Insufficient stock for $color');
-                  //       }
-
-                  //       // Deduct quantity and update sold count
-                  //       quantities[colorIndex] -= orderQuantity;
-                  //       quantitySold[colorIndex] += orderQuantity;
-                  //       totalQuantitySold += orderQuantity;
-                  //     }
-
-                  //     updatedBagsData[bagId] = {
-                  //       "quantity": quantities,
-                  //       "totalQuantitySold": totalQuantitySold,
-                  //       "quantitySold": quantitySold,
-                  //     };
-                  //   }
-
-                  //   // Step 3: Perform all writes after processing
-                  //   for (String bagId in updatedBagsData.keys) {
-                  //     final bagRef = firestore.collection('Bags').doc(bagId);
-
-                  //     transaction.update(bagRef, updatedBagsData[bagId]!);
-                  //   }
-
-                  //   // Step 4: Create the order
-                  //   String orderId =
-                  //       DateTime.now().millisecondsSinceEpoch.toString();
-
-                  //   Map<String, dynamic> orderMap = {
-                  //     "orderId": orderId,
-                  //     "bags": cart.entries
-                  //         .map((entry) {
-                  //           return entry.value.entries.map((colorEntry) {
-                  //             return {
-                  //               "bagId": entry.key,
-                  //               "color": colorEntry.key,
-                  //               "quantity": colorEntry.value,
-                  //             };
-                  //           }).toList();
-                  //         })
-                  //         .expand((x) => x)
-                  //         .toList(),
-                  //     "status": "Pending",
-                  //     "totalItems": getTotalQuantity(),
-                  //     "createdAt": DateTime.now().toIso8601String(),
-                  //   };
-
-                  //   final orderRef =
-                  //       firestore.collection('Orders').doc(orderId);
-
-                  //   transaction.set(orderRef, orderMap);
-                  // }).then((_) {
-                  //   CustomToast.show(
-                  //     'Order placed successfully',
-                  //     duration: 2,
-                  //   );
-
-                  //   setState(() {
-                  //     cart.clear();
-                  //     selectedBagId = null;
-                  //     selectedBagName = null;
-                  //   });
-                  // }).catchError((error) {
-                  //   CustomToast.show(
-                  //     'Error: $error',
-                  //     bgColor: ColorPalette.negativeColor[400]!,
-                  //   );
-                  // });
+                  if (mounted) {
+                    Navigator.pop(context);
+                  }
                 },
-                text: 'Next',
+                text: 'Add Bags',
               ),
           ],
         ),
