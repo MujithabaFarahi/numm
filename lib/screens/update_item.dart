@@ -28,6 +28,7 @@ class _UpdateItemState extends State<UpdateItem> {
   List<int?> _availableQuantity = [];
   bool isLoading = true;
   int? selectedIndex;
+  String? existingName;
 
   final TextEditingController _colorController = TextEditingController();
   final TextEditingController _bagController = TextEditingController();
@@ -52,6 +53,7 @@ class _UpdateItemState extends State<UpdateItem> {
         final data = docSnapshot.data() as Map<String, dynamic>;
 
         setState(() {
+          existingName = data['name'] ?? '';
           _bagController.text = data['name'] ?? '';
           _selectedGarment = data['garment'];
           _availableColors = List<String>.from(data['colors'] ?? []);
@@ -406,6 +408,8 @@ class _UpdateItemState extends State<UpdateItem> {
                               : word)
                           .join(' ');
 
+                      if (bagName == existingName) {}
+
                       Map<String, dynamic> bagInfoMap = {
                         "id": widget.id,
                         "name": bagName,
@@ -427,6 +431,10 @@ class _UpdateItemState extends State<UpdateItem> {
                       setState(() {
                         isLoading = false;
                       });
+
+                      if (mounted) {
+                        Navigator.pop(context);
+                      }
                     },
                     text: 'Update Bag Details',
                   ),

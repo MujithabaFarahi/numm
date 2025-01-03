@@ -37,11 +37,16 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (!userSnapshot.exists) {
       await userDoc.set({
+        'id': user.uid,
         'email': user.email ?? '',
+        'lastLogin': DateTime.now().toIso8601String(),
+        'createdAt': DateTime.now().toIso8601String(),
       });
     }
 
-    Navigator.pushReplacementNamed(context, '/home');
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/home');
+    }
   }
 
   @override

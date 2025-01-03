@@ -25,6 +25,7 @@ class ColorPalette {
   };
 
   static const Map<int, Color> mainBlue = {
+    50: Color.fromRGBO(0, 0, 255, 0.03), // Light Level 1
     100: Color(0xFFE7ECFF), // Light Level 1
     200: Color(0xFFC9D8FF), // Light Level 2
     300: Color(0xFFA9C4FF), // Light Level 3

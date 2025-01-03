@@ -69,4 +69,37 @@ class DatabaseMethods {
         .collection("Users")
         .snapshots(includeMetadataChanges: true);
   }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getUserById(String id) {
+    return FirebaseFirestore.instance
+        .collection("Users")
+        .doc(id)
+        .snapshots(includeMetadataChanges: true);
+  }
+
+  Future addReturn(Map<String, dynamic> returnInfoMap, String id) async {
+    return await FirebaseFirestore.instance
+        .collection("Orders")
+        .doc(id)
+        .set(returnInfoMap);
+  }
+
+  Stream<QuerySnapshot> getAllReturns() {
+    return FirebaseFirestore.instance
+        .collection("Returns")
+        .snapshots(includeMetadataChanges: true);
+  }
+
+  Stream<QuerySnapshot> getAllBuyings() {
+    return FirebaseFirestore.instance
+        .collection("Buyings")
+        .snapshots(includeMetadataChanges: true);
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getBuyingById(String id) {
+    return FirebaseFirestore.instance
+        .collection("Buyings")
+        .doc(id)
+        .snapshots(includeMetadataChanges: true);
+  }
 }

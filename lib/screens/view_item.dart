@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nummlk/blocs/Item/item_bloc.dart';
+import 'package:nummlk/theme/color_pallette.dart';
 import 'package:nummlk/widgets/appbar.dart';
 
 class ViewItem extends StatefulWidget {
@@ -61,12 +62,14 @@ class _ViewItemState extends State<ViewItem> {
                 const SizedBox(height: 8),
                 Text(
                   'Garment: ${bag.garment}',
-                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+                  style: TextStyle(
+                      fontSize: 16, color: ColorPalette.mainGray[500]),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Total Quantity Sold: ${bag.totalQuantitySold}',
-                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+                  style: TextStyle(
+                      fontSize: 16, color: ColorPalette.mainGray[500]),
                 ),
                 const Divider(height: 32),
                 const Text(
@@ -95,15 +98,29 @@ class _ViewItemState extends State<ViewItem> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Available Stock: ${bag.quantity[index]}',
-                                  style: const TextStyle(
-                                      fontSize: 14, color: Colors.grey),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Bought: ${bag.quantityBought[index]}',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: ColorPalette.mainGray[500]),
+                                    ),
+                                    Text(
+                                      'Sold: ${bag.quantitySold[index]}',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: ColorPalette.mainGray[500]),
+                                    ),
+                                  ],
                                 ),
                                 Text(
-                                  'Quantity Sold: ${bag.quantitySold[index]}',
-                                  style: const TextStyle(
-                                      fontSize: 14, color: Colors.grey),
+                                  'Available: ${bag.quantity[index]}',
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: ColorPalette.mainGray[500]),
                                 ),
                               ],
                             ),
@@ -120,15 +137,15 @@ class _ViewItemState extends State<ViewItem> {
                     Expanded(
                       child: Text(
                         'Created At: ${bag.createdAt.toString().split(' ')[0]}',
-                        style:
-                            const TextStyle(fontSize: 14, color: Colors.grey),
+                        style: TextStyle(
+                            fontSize: 14, color: ColorPalette.mainGray[500]),
                       ),
                     ),
                     Expanded(
                       child: Text(
                         'Last Updated: ${bag.lastUpdated.toString().split(' ')[0]}',
-                        style:
-                            const TextStyle(fontSize: 14, color: Colors.grey),
+                        style: TextStyle(
+                            fontSize: 14, color: ColorPalette.mainGray[500]),
                       ),
                     ),
                   ],

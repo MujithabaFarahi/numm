@@ -5,8 +5,8 @@ class User {
   final String role;
   final double itemsProcessed;
   final int orderDeals;
-  final DateTime createdAt;
-  final DateTime lastUpdated;
+  // final DateTime createdAt;
+  final DateTime lastLogin;
 
   User({
     required this.id,
@@ -15,8 +15,8 @@ class User {
     required this.role,
     required this.itemsProcessed,
     required this.orderDeals,
-    required this.createdAt,
-    required this.lastUpdated,
+    // required this.createdAt,
+    required this.lastLogin,
   });
 
   /// Factory constructor to create a User from Firestore data
@@ -28,10 +28,10 @@ class User {
       role: data['role'] ?? '',
       itemsProcessed: (data['itemsProcessed'] ?? 0.0).toDouble(),
       orderDeals: data['orderDeals'] ?? 0,
-      createdAt:
-          DateTime.parse(data['createdAt'] ?? DateTime.now().toIso8601String()),
-      lastUpdated: DateTime.parse(
-          data['lastUpdated'] ?? DateTime.now().toIso8601String()),
+      // createdAt:
+      // DateTime.parse(data['createdAt'] ?? DateTime.now().toIso8601String()),
+      lastLogin:
+          DateTime.parse(data['lastLogin'] ?? DateTime.now().toIso8601String()),
     );
   }
 
@@ -44,10 +44,10 @@ class User {
       role: map['role'] ?? '',
       itemsProcessed: (map['itemsProcessed'] ?? 0.0).toDouble(),
       orderDeals: map['orderDeals'] ?? 0,
-      createdAt:
-          DateTime.parse(map['createdAt'] ?? DateTime.now().toIso8601String()),
-      lastUpdated: DateTime.parse(
-          map['lastUpdated'] ?? DateTime.now().toIso8601String()),
+      // createdAt:
+      // DateTime.parse(map['createdAt'] ?? DateTime.now().toIso8601String()),
+      lastLogin:
+          DateTime.parse(map['lastLogin'] ?? DateTime.now().toIso8601String()),
     );
   }
 
@@ -60,8 +60,8 @@ class User {
       'role': role,
       'itemsProcessed': itemsProcessed,
       'orderDeals': orderDeals,
-      'createdAt': createdAt.toIso8601String(),
-      'lastUpdated': lastUpdated.toIso8601String(),
+      // 'createdAt': createdAt.toIso8601String(),
+      'lastLogin': lastLogin.toIso8601String(),
     };
   }
 
@@ -73,8 +73,8 @@ class User {
     String? role,
     double? itemsProcessed,
     int? orderDeals,
-    DateTime? createdAt,
-    DateTime? lastUpdated,
+    // DateTime? createdAt,
+    DateTime? lastLogin,
   }) {
     return User(
       id: id ?? this.id,
@@ -83,8 +83,8 @@ class User {
       role: role ?? this.role,
       itemsProcessed: itemsProcessed ?? this.itemsProcessed,
       orderDeals: orderDeals ?? this.orderDeals,
-      createdAt: createdAt ?? this.createdAt,
-      lastUpdated: lastUpdated ?? this.lastUpdated,
+      // createdAt: createdAt ?? this.createdAt,
+      lastLogin: lastLogin ?? this.lastLogin,
     );
   }
 }

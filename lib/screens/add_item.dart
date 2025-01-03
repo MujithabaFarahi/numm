@@ -365,10 +365,6 @@ class _AddItemState extends State<AddItem> {
                         return;
                       }
 
-                      setState(() {
-                        isLoading = true;
-                      });
-
                       String bagName = _bagController.text
                           .trim()
                           .split(' ')
@@ -380,43 +376,51 @@ class _AddItemState extends State<AddItem> {
                       bool isUnique =
                           await DatabaseMethods().isNameUnique(bagName);
 
-                      if (isUnique) {
-                        String id = const Uuid().v4();
-
-                        Map<String, dynamic> bagInfoMap = {
-                          "id": id,
-                          "name": bagName,
-                          "garment": _selectedGarment,
-                          "colors": _availableColors,
-                          "quantity": List.generate(
-                              _availableColors.length, (index) => 0),
-                          "quantitySold": List.generate(
-                              _availableColors.length, (index) => 0),
-                          "totalQuantitySold": 0,
-                          "createdAt": DateTime.now().toIso8601String(),
-                          "lastUpdated": DateTime.now().toIso8601String(),
-                        };
-
-                        await DatabaseMethods()
-                            .addItem(bagInfoMap, id)
-                            .then((value) {
-                          CustomToast.show(
-                            "Bag Details added successfully",
-                            bgColor: Colors.green,
-                            textColor: Colors.white,
-                          );
-                        });
-
-                        _bagController.clear();
-                        setState(() {
-                          _selectedGarment = null;
-                          _availableColors.clear();
-                          // _availableQuantity.clear();
-                        });
-                      } else {
+                      if (!isUnique) {
                         CustomToast.show("Name already exists",
                             bgColor: Colors.red);
+
+                        return;
                       }
+
+                      setState(() {
+                        isLoading = true;
+                      });
+
+                      String id = const Uuid().v4();
+
+                      Map<String, dynamic> bagInfoMap = {
+                        "id": id,
+                        "name": bagName,
+                        "garment": _selectedGarment,
+                        "colors": _availableColors,
+                        "quantityBought": List.generate(
+                            _availableColors.length, (index) => 0),
+                        "quantity": List.generate(
+                            _availableColors.length, (index) => 0),
+                        "quantitySold": List.generate(
+                            _availableColors.length, (index) => 0),
+                        "totalQuantitySold": 0,
+                        "createdAt": DateTime.now().toIso8601String(),
+                        "lastUpdated": DateTime.now().toIso8601String(),
+                      };
+
+                      await DatabaseMethods()
+                          .addItem(bagInfoMap, id)
+                          .then((value) {
+                        CustomToast.show(
+                          "Bag Details added successfully",
+                          bgColor: Colors.green,
+                          textColor: Colors.white,
+                        );
+                      });
+
+                      _bagController.clear();
+                      setState(() {
+                        _selectedGarment = null;
+                        _availableColors.clear();
+                        // _availableQuantity.clear();
+                      });
 
                       setState(() {
                         isLoading = false;

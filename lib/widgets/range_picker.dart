@@ -9,7 +9,8 @@ void showDateRangePickerDialog(BuildContext context) {
     barrierDismissible: false,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('Select Date Range'),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 4),
+        title: const Text('Search Order in Date Range'),
         content: StatefulBuilder(
           builder: (context, setState) {
             return Column(
@@ -24,7 +25,7 @@ void showDateRangePickerDialog(BuildContext context) {
                       DateTime? pickedDate = await showDatePicker(
                         context: context,
                         initialDate: startTime ?? DateTime.now(),
-                        firstDate: DateTime(1900),
+                        firstDate: DateTime(2023),
                         lastDate: DateTime(2100),
                       );
                       if (pickedDate != null) {
@@ -44,7 +45,7 @@ void showDateRangePickerDialog(BuildContext context) {
                       DateTime? pickedDate = await showDatePicker(
                         context: context,
                         initialDate: endTime ?? (startTime ?? DateTime.now()),
-                        firstDate: startTime ?? DateTime(1900),
+                        firstDate: startTime ?? DateTime(2023),
                         lastDate: DateTime(2100),
                       );
                       if (pickedDate != null) {

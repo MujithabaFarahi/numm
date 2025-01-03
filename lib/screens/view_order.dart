@@ -84,7 +84,7 @@ class _ViewOrderState extends State<ViewOrder> {
                                 color: ColorPalette.mainGray[500]!),
                           )
                         : Text(
-                            'Other Order:',
+                            'Other Order',
                             style: TextStyle(
                                 fontSize: 14,
                                 color: ColorPalette.mainGray[500]!),

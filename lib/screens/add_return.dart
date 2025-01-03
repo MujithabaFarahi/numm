@@ -150,10 +150,13 @@ class _AddReturnState extends State<AddReturn> {
                           name: ds.name,
                           garment: ds.garment,
                           onTap: () {
+                            final selectedBag =
+                                bags.firstWhere((bag) => bag.id == ds.id);
+
                             setState(() {
                               selectedBagName = ds.name;
                               selectedBagId = ds.id;
-                              selectedColor = null;
+                              selectedColor = selectedBag.colors[0];
                             });
                           },
                         );
@@ -369,9 +372,9 @@ class _AddReturnState extends State<AddReturn> {
                           throw Exception('Color not found in bag');
                         }
 
-                        if (quantities[colorIndex] < orderQuantity) {
-                          throw Exception('Insufficient stock for $color');
-                        }
+                        // if (quantities[colorIndex] < orderQuantity) {
+                        //   throw Exception('Insufficient stock for $color');
+                        // }
 
                         // Deduct quantity and update sold count
                         quantities[colorIndex] += orderQuantity;

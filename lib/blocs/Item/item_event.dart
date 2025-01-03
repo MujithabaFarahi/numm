@@ -22,6 +22,7 @@ final class GetItemById extends ItemEvent {
 
 final class SearchItems extends ItemEvent {
   final String query;
+
   const SearchItems(
     this.query,
   );
@@ -61,4 +62,36 @@ final class GetAllUsers extends ItemEvent {
 
   @override
   List<Object?> get props => [];
+}
+
+final class GetUserById extends ItemEvent {
+  final String id;
+
+  const GetUserById(this.id);
+
+  @override
+  List<Object?> get props => [id];
+}
+
+final class GetAllReturns extends ItemEvent {
+  const GetAllReturns();
+
+  @override
+  List<Object?> get props => [];
+}
+
+final class GetAllBuyings extends ItemEvent {
+  const GetAllBuyings();
+
+  @override
+  List<Object?> get props => [];
+}
+
+final class GetBuyingById extends ItemEvent {
+  final String id;
+
+  const GetBuyingById(this.id);
+
+  @override
+  List<Object?> get props => [id];
 }

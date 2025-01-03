@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:nummlk/Models/bag_model.dart';
+import 'package:nummlk/Models/buying_model.dart';
 import 'package:nummlk/Models/order_model.dart';
+import 'package:nummlk/Models/return_model.dart';
 import 'package:nummlk/Models/user_model.dart';
 import 'package:nummlk/service/database.dart';
 
@@ -21,6 +23,9 @@ class ItemBloc extends Bloc<ItemEvent, ItemState> {
     on<GetOrderById>(_onGetOrderById);
     on<GetAllOrders>(_onGetAllOrders);
     on<GetAllUsers>(_onGetAllUsers);
+    on<GetUserById>(_onGetUserById);
+    on<GetAllReturns>(_onGetAllReturns);
+    on<GetAllBuyings>(_onGetAllBuyings);
   }
 
   FutureOr<void> _onGetAllItems(
@@ -37,7 +42,7 @@ class ItemBloc extends Bloc<ItemEvent, ItemState> {
           return Bag.fromMap(data);
         }).toList();
 
-        emit(state.copyWith(isLoading: false, bags: bags));
+        emit(state.copyWith(isLoading: false, bags: bags, allBags: bags));
       }
     } catch (e) {
       emit(state.copyWith(
@@ -185,6 +190,77 @@ class ItemBloc extends Bloc<ItemEvent, ItemState> {
         }).toList();
 
         emit(state.copyWith(isLoading: false, users: users));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        isError: true,
+        message: e.toString(),
+      ));
+    }
+  }
+
+  FutureOr<void> _onGetUserById(
+      GetUserById event, Emitter<ItemState> emit) async {
+    try {
+      emit(state.copyWith(isLoading: true, isError: false, message: null));
+
+      final query = databaseMethods.getUserById(event.id);
+
+      await for (final documentSnapshot in query) {
+        final data = documentSnapshot.data();
+        final user = User.fromMap(data!);
+        emit(state.copyWith(isLoading: false, user: user));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        isError: true,
+        message: e.toString(),
+      ));
+    }
+  }
+
+  FutureOr<void> _onGetAllReturns(
+      GetAllReturns event, Emitter<ItemState> emit) async {
+    try {
+      emit(state.copyWith(isLoading: true, isError: false, message: null));
+
+      final query = databaseMethods.getAllReturns();
+
+      await for (final querySnapshot in query) {
+        final returns = querySnapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+
+          return Return.fromMap(data);
+        }).toList();
+
+        emit(state.copyWith(isLoading: false, returnns: returns));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        isError: true,
+        message: e.toString(),
+      ));
+    }
+  }
+
+  FutureOr<void> _onGetAllBuyings(
+      GetAllBuyings event, Emitter<ItemState> emit) async {
+    try {
+      emit(state.copyWith(isLoading: true, isError: false, message: null));
+
+      final query = databaseMethods.getAllBuyings();
+
+      await for (final querySnapshot in query) {
+        final buyings = querySnapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+
+          return Buying.fromMap(data);
+        }).toList();
+
+        emit(state.copyWith(isLoading: false, buyings: buyings));
       }
     } catch (e) {
       emit(state.copyWith(

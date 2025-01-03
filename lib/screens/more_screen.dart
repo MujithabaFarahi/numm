@@ -13,8 +13,6 @@ class MoreScreen extends StatelessWidget {
     final GoogleSignIn googleSignIn = GoogleSignIn();
 
     try {
-      Navigator.pop(context);
-
       await googleSignIn.signOut();
       await FirebaseAuth.instance.signOut();
 
@@ -47,7 +45,9 @@ class MoreScreen extends StatelessWidget {
                 title: 'My Profile',
                 icon: 'assets/icons/user.png',
                 onTap: () {
-                  // Navigator.of(context).pushNamed('/myprofile');
+                  Navigator.of(context).pushNamed('/user', arguments: {
+                    "isUser": true,
+                  });
                 },
                 isBordered: true,
               ),
@@ -60,10 +60,18 @@ class MoreScreen extends StatelessWidget {
                 isBordered: true,
               ),
               SelectCard(
-                title: 'Add Bags',
+                title: 'Buy Bags',
                 icon: 'assets/icons/bag-outline.png',
                 onTap: () {
                   Navigator.of(context).pushNamed('/addBag');
+                },
+                isBordered: true,
+              ),
+              SelectCard(
+                title: 'Buyings',
+                icon: 'assets/icons/buy.png',
+                onTap: () {
+                  // Navigator.of(context).pushNamed('/addBag');
                 },
                 isBordered: true,
               ),

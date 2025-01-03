@@ -10,10 +10,20 @@ import 'package:nummlk/screens/update_item.dart';
 import 'package:nummlk/screens/view_item.dart';
 import 'package:nummlk/screens/view_order.dart';
 import 'package:nummlk/screens/view_orders.dart';
+import 'package:nummlk/screens/view_user.dart';
 
 class AppRouter {
   Route onGenerateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
+      case '/user':
+        final args = routeSettings.arguments as Map<String, dynamic>?;
+        return _createRoute(
+          ViewUser(
+            userId: args?['userId'],
+            isUser: args?['isUser'],
+          ),
+        );
+
       case '/addBag':
         return _createRoute(
           const AddBag(),

@@ -173,10 +173,13 @@ class _AddBagState extends State<AddBag> {
                           name: ds.name,
                           garment: ds.garment,
                           onTap: () {
+                            final selectedBag =
+                                bags.firstWhere((bag) => bag.id == ds.id);
+
                             setState(() {
                               selectedBagName = ds.name;
                               selectedBagId = ds.id;
-                              selectedColor = null;
+                              selectedColor = selectedBag.colors[0];
                             });
                           },
                         );
@@ -391,6 +394,8 @@ class _AddBagState extends State<AddBag> {
                           List<String>.from(bagData['colors']);
                       List<int> quantities =
                           List<int>.from(bagData['quantity']);
+                      List<int> quantityBought =
+                          List<int>.from(bagData['quantityBought']);
 
                       for (var entry in cart[bagId]!.entries) {
                         String color = entry.key;
@@ -401,15 +406,16 @@ class _AddBagState extends State<AddBag> {
                           throw Exception('Color not found in bag');
                         }
 
-                        if (quantities[colorIndex] < orderQuantity) {
-                          throw Exception('Insufficient stock for $color');
-                        }
-
+                        // if (quantities[colorIndex] < orderQuantity) {
+                        //   throw Exception('Insufficient stock for $color');
+                        // }
+                        quantityBought[colorIndex] += orderQuantity;
                         quantities[colorIndex] += orderQuantity;
                       }
 
                       updatedBagsData[bagId] = {
                         "quantity": quantities,
+                        "quantityBought": quantityBought,
                       };
                     }
 
@@ -442,7 +448,7 @@ class _AddBagState extends State<AddBag> {
                     };
 
                     final orderRef =
-                        firestore.collection('Returns').doc(returnId);
+                        firestore.collection('Buyings').doc(returnId);
 
                     transaction.set(orderRef, orderMap);
                   }).then((_) {

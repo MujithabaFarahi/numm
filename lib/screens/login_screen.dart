@@ -77,7 +77,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (!userSnapshot.exists) {
       await userDoc.set({
+        'id': user.uid,
         'email': user.email ?? '',
+        'lastLogin': DateTime.now().toIso8601String(),
+        'createdAt': DateTime.now().toIso8601String(),
+      });
+    } else {
+      await userDoc.update({
+        'lastLogin': DateTime.now().toIso8601String(),
       });
     }
 

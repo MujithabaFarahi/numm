@@ -37,7 +37,7 @@ class _ConfirmOrderState extends State<ConfirmOrder> {
     super.initState();
     final itemBloc = BlocProvider.of<ItemBloc>(context);
 
-    bags = itemBloc.state.bags;
+    bags = itemBloc.state.allBags;
     users = itemBloc.state.users;
   }
 

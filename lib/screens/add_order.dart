@@ -149,11 +149,25 @@ class _AddOrderState extends State<AddOrder> {
                           name: ds.name,
                           garment: ds.garment,
                           onTap: () {
+                            final selectedBag =
+                                bags.firstWhere((bag) => bag.id == ds.id);
                             setState(() {
                               selectedBagName = ds.name;
                               selectedBagId = ds.id;
-                              selectedColor = null;
+                              selectedColor = selectedBag.colors[0];
                             });
+
+                            maxQuantity = selectedBag.quantity[0];
+                            if (maxQuantity < 1) {
+                              CustomToast.show(
+                                '$selectedColor of $selectedBagName is out of stock',
+                                bgColor: ColorPalette.negativeColor[500]!,
+                              );
+
+                              setState(() {
+                                selectedColor = null;
+                              });
+                            }
                           },
                         );
                       },
@@ -226,6 +240,9 @@ class _AddOrderState extends State<AddOrder> {
                   });
                 },
               ),
+            const SizedBox(
+              height: 8,
+            ),
             if (selectedColor != null)
               Row(
                 children: [
