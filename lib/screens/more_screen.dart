@@ -39,7 +39,7 @@ class MoreScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20),
           child: Wrap(
-            runSpacing: 12,
+            runSpacing: 8,
             children: [
               SelectCard(
                 title: 'My Profile',

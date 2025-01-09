@@ -4,7 +4,7 @@ class User {
   final String email;
   final String role;
   final double itemsProcessed;
-  final int orderDeals;
+  final int orderCount;
   // final DateTime createdAt;
   final DateTime lastLogin;
 
@@ -14,7 +14,7 @@ class User {
     required this.email,
     required this.role,
     required this.itemsProcessed,
-    required this.orderDeals,
+    required this.orderCount,
     // required this.createdAt,
     required this.lastLogin,
   });
@@ -27,7 +27,7 @@ class User {
       email: data['email'] ?? '',
       role: data['role'] ?? '',
       itemsProcessed: (data['itemsProcessed'] ?? 0.0).toDouble(),
-      orderDeals: data['orderDeals'] ?? 0,
+      orderCount: data['orderCount'] ?? 0,
       // createdAt:
       // DateTime.parse(data['createdAt'] ?? DateTime.now().toIso8601String()),
       lastLogin:
@@ -43,7 +43,7 @@ class User {
       email: map['email'] ?? '',
       role: map['role'] ?? '',
       itemsProcessed: (map['itemsProcessed'] ?? 0.0).toDouble(),
-      orderDeals: map['orderDeals'] ?? 0,
+      orderCount: map['orderCount'] ?? 0,
       // createdAt:
       // DateTime.parse(map['createdAt'] ?? DateTime.now().toIso8601String()),
       lastLogin:
@@ -59,7 +59,7 @@ class User {
       'email': email,
       'role': role,
       'itemsProcessed': itemsProcessed,
-      'orderDeals': orderDeals,
+      'orderCount': orderCount,
       // 'createdAt': createdAt.toIso8601String(),
       'lastLogin': lastLogin.toIso8601String(),
     };
@@ -72,7 +72,7 @@ class User {
     String? email,
     String? role,
     double? itemsProcessed,
-    int? orderDeals,
+    int? orderCount,
     // DateTime? createdAt,
     DateTime? lastLogin,
   }) {
@@ -82,7 +82,7 @@ class User {
       email: email ?? this.email,
       role: role ?? this.role,
       itemsProcessed: itemsProcessed ?? this.itemsProcessed,
-      orderDeals: orderDeals ?? this.orderDeals,
+      orderCount: orderCount ?? this.orderCount,
       // createdAt: createdAt ?? this.createdAt,
       lastLogin: lastLogin ?? this.lastLogin,
     );

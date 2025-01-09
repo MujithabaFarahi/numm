@@ -79,20 +79,22 @@ class ItemBloc extends Bloc<ItemEvent, ItemState> {
     try {
       emit(state.copyWith(isLoading: true, isError: false, message: null));
 
-      final query = databaseMethods.getAllItems();
+      // final query = databaseMethods.getAllItems();
 
-      await for (final querySnapshot in query) {
-        final bags = querySnapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          return Bag.fromMap(data);
-        }).toList();
+      // await for (final querySnapshot in query) {
+      //   final bags = querySnapshot.docs.map((doc) {
+      //     final data = doc.data() as Map<String, dynamic>;
+      //     return Bag.fromMap(data);
+      //   }).toList();
 
-        final filteredBags = bags.where((bag) {
-          return bag.name.toLowerCase().contains(event.query.toLowerCase());
-        }).toList();
+      final bags = state.allBags;
 
-        emit(state.copyWith(isLoading: false, bags: filteredBags));
-      }
+      final filteredBags = bags.where((bag) {
+        return bag.name.toLowerCase().contains(event.query.toLowerCase());
+      }).toList();
+
+      emit(state.copyWith(isLoading: false, bags: filteredBags));
+      // }
     } catch (e) {
       emit(state.copyWith(
         isLoading: false,
@@ -164,7 +166,8 @@ class ItemBloc extends Bloc<ItemEvent, ItemState> {
           return BagOrder.fromMap(data);
         }).toList();
 
-        emit(state.copyWith(isLoading: false, orders: orders));
+        emit(state.copyWith(
+            isLoading: false, orders: orders, allOrders: orders));
       }
     } catch (e) {
       emit(state.copyWith(

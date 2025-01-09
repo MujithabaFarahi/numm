@@ -32,11 +32,13 @@ class BagCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          color: ColorPalette.mainBlue[100],
+          color: ColorPalette.mainBlue[50],
         ),
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: onTap,
+          splashColor: ColorPalette.mainBlue[100],
+          highlightColor: ColorPalette.mainBlue[100],
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(

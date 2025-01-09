@@ -26,6 +26,7 @@ class _AddBagState extends State<AddBag> {
   String? selectedColor;
   int quantity = 1;
   List<Bag> bags = [];
+  bool isLoading = false;
 
   final TextEditingController _quantityController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
@@ -65,6 +66,7 @@ class _AddBagState extends State<AddBag> {
       cart[selectedBagId!]![selectedColor!] = quantity;
       selectedColor = null;
       quantity = 1;
+      _quantityController.text = quantity.toString();
     });
 
     CustomToast.show(
@@ -190,9 +192,7 @@ class _AddBagState extends State<AddBag> {
                   }
                 }),
               ),
-            const SizedBox(
-              height: 12,
-            ),
+            const SizedBox(height: 12),
             if (selectedBagId != null)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -210,6 +210,7 @@ class _AddBagState extends State<AddBag> {
                       setState(() {
                         selectedBagId = null;
                         selectedBagName = null;
+                        selectedColor = null;
                       });
                     },
                     height: 25,
@@ -220,9 +221,7 @@ class _AddBagState extends State<AddBag> {
                   )
                 ],
               ),
-            const SizedBox(
-              height: 12,
-            ),
+            if (selectedBagId != null) const SizedBox(height: 12),
             if (selectedBagId != null)
               CustomDropdown(
                 hintText: 'Select Color',
@@ -237,7 +236,7 @@ class _AddBagState extends State<AddBag> {
                   });
                 },
               ),
-            const SizedBox(height: 10),
+            if (selectedColor != null) const SizedBox(height: 10),
             if (selectedColor != null)
               SizedBox(
                 child: Row(
@@ -274,7 +273,7 @@ class _AddBagState extends State<AddBag> {
                   ],
                 ),
               ),
-            const SizedBox(height: 16),
+            if (selectedColor != null) const SizedBox(height: 12),
             if (selectedColor != null)
               PrimaryButton(
                 onPressed: () {
@@ -282,7 +281,7 @@ class _AddBagState extends State<AddBag> {
                 },
                 text: 'Add Bag',
               ),
-            const SizedBox(height: 16),
+            if (cart.isNotEmpty) const SizedBox(height: 16),
             if (cart.isNotEmpty)
               Expanded(
                 child: Column(
@@ -362,6 +361,9 @@ class _AddBagState extends State<AddBag> {
                   ],
                 ),
               ),
+            const SizedBox(
+              height: 10,
+            ),
             if (cart.isNotEmpty)
               PrimaryButton(
                 onPressed: () async {

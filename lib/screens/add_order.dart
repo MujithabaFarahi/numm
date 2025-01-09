@@ -53,6 +53,8 @@ class _AddOrderState extends State<AddOrder> {
       cart[selectedBagId!]![selectedColor!] = quantity;
       selectedColor = null;
       quantity = 1;
+      selectedBagId = null;
+      selectedBagName = null;
     });
     CustomToast.show(
       '$bagName added to order',

@@ -88,7 +88,7 @@ class _ViewUserState extends State<ViewUser> {
                           fontSize: 16, color: ColorPalette.mainGray[500]),
                     ),
                     Text(
-                      'Order Deals: ${user.orderDeals}',
+                      'Order Deals: ${user.orderCount}',
                       style: TextStyle(
                           fontSize: 16, color: ColorPalette.mainGray[500]),
                     ),

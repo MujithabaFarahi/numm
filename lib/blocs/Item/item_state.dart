@@ -9,6 +9,7 @@ class ItemState extends Equatable {
   final Bag? bag;
   final BagOrder? order;
   final List<BagOrder> orders;
+  final List<BagOrder> allOrders;
   final User? user;
   final List<User> users;
   final Return? returnn;
@@ -25,6 +26,7 @@ class ItemState extends Equatable {
     this.bag,
     this.order,
     this.orders = const [],
+    this.allOrders = const [],
     this.user,
     this.users = const [],
     this.returnn,
@@ -42,6 +44,7 @@ class ItemState extends Equatable {
     Bag? bag,
     BagOrder? order,
     List<BagOrder>? orders,
+    List<BagOrder>? allOrders,
     User? user,
     List<User>? users,
     Return? returnn,
@@ -58,6 +61,7 @@ class ItemState extends Equatable {
       bag: bag ?? this.bag,
       order: order ?? this.order,
       orders: orders ?? this.orders,
+      allOrders: allOrders ?? this.allOrders,
       user: user ?? this.user,
       users: users ?? this.users,
       returnn: returnn ?? this.returnn,
@@ -77,6 +81,7 @@ class ItemState extends Equatable {
         bag,
         order,
         orders,
+        allOrders,
         user,
         users,
         returnn,

@@ -26,6 +26,7 @@ class _UpdateItemState extends State<UpdateItem> {
   // int quantity = 1;
   List<String> _availableColors = [];
   List<int?> _availableQuantity = [];
+  List<int?> _quantityBought = [];
   bool isLoading = true;
   int? selectedIndex;
   String? existingName;
@@ -58,6 +59,7 @@ class _UpdateItemState extends State<UpdateItem> {
           _selectedGarment = data['garment'];
           _availableColors = List<String>.from(data['colors'] ?? []);
           _availableQuantity = List<int>.from(data['quantity'] ?? []);
+          _quantityBought = List<int>.from(data['quantityBought'] ?? []);
           // _quantityController.text = quantity.toString();
           isLoading = false;
         });
@@ -257,6 +259,7 @@ class _UpdateItemState extends State<UpdateItem> {
                                             .contains(newColor)) {
                                           setState(() {
                                             _availableColors.add(newColor);
+                                            _quantityBought.add(0);
                                             _availableQuantity.add(0);
                                             _colorController.clear();
                                             // _updateQuantity(1);
@@ -283,14 +286,27 @@ class _UpdateItemState extends State<UpdateItem> {
                               final index = entry.key;
                               final color = entry.value;
                               final quantity = _availableQuantity[index];
+                              final totalQuantity = _quantityBought[index];
 
                               return Dismissible(
                                 key: Key(color),
                                 direction: DismissDirection.horizontal,
+                                confirmDismiss: (direction) async {
+                                  if (quantity! < 1 && totalQuantity! < 1) {
+                                    return true;
+                                  } else {
+                                    CustomToast.show(
+                                      'Cannot remove $color',
+                                      bgColor: Colors.red,
+                                    );
+                                    return false;
+                                  }
+                                },
                                 onDismissed: (direction) {
                                   setState(() {
                                     _availableColors.removeAt(index);
                                     _availableQuantity.removeAt(index);
+                                    _quantityBought.removeAt(index);
                                   });
                                   CustomToast.show(
                                     '$color removed',
@@ -344,21 +360,40 @@ class _UpdateItemState extends State<UpdateItem> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 16, vertical: 6),
                                           child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text(
-                                                color,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
+                                              Expanded(
+                                                child: Text(
+                                                  color,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
                                                 ),
                                               ),
-                                              Text(
-                                                quantity.toString(),
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
+                                              SizedBox(
+                                                width: 120,
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      totalQuantity.toString(),
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      quantity.toString(),
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
                                             ],
@@ -415,6 +450,7 @@ class _UpdateItemState extends State<UpdateItem> {
                         "name": bagName,
                         "colors": _availableColors,
                         "quantity": _availableQuantity,
+                        "quantityBought": _quantityBought,
                         "lastUpdated": DateTime.now().toIso8601String(),
                       };
 

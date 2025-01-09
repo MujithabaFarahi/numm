@@ -57,68 +57,77 @@ class PrimaryTextfield extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextField(
-          focusNode: focusNode,
-          textAlign: textAlign,
-          keyboardType: keyboardType,
-          onChanged: onChanged,
-          controller: controller,
-          obscureText: obscureText,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: backgroundColor,
-            labelText: labelText,
-            labelStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: fontWeight,
+        Theme(
+          data: Theme.of(context).copyWith(
+            textSelectionTheme: TextSelectionThemeData(
+              selectionColor: ColorPalette.mainBlue[300],
+              selectionHandleColor: ColorPalette.primaryBlue,
             ),
-            floatingLabelBehavior: FloatingLabelBehavior.auto,
-            floatingLabelStyle: TextStyle(
+          ),
+          child: TextField(
+            focusNode: focusNode,
+            textAlign: textAlign,
+            keyboardType: keyboardType,
+            onChanged: onChanged,
+            controller: controller,
+            obscureText: obscureText,
+            cursorColor: ColorPalette.primaryBlue,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: backgroundColor,
+              labelText: labelText,
+              labelStyle: TextStyle(
                 fontSize: fontSize,
                 fontWeight: fontWeight,
-                color: ColorPalette.mainGray[600]),
-            alignLabelWithHint: true,
-            contentPadding: const EdgeInsets.symmetric(
-              vertical: 12,
-              horizontal: 16.0,
+              ),
+              floatingLabelBehavior: FloatingLabelBehavior.auto,
+              floatingLabelStyle: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: fontWeight,
+                  color: ColorPalette.mainGray[600]),
+              alignLabelWithHint: true,
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 12,
+                horizontal: 16.0,
+              ),
+              hintText: hintText,
+              hintStyle: TextStyle(
+                fontFamily: fontFamily,
+                fontSize: fontSize,
+                fontWeight: fontWeight,
+                color: textColor.withOpacity(0.7),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(borderRadius),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: isError ? Colors.red : borderColor,
+                  width: 1.5,
+                ),
+                borderRadius: BorderRadius.circular(borderRadius),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: borderColor,
+                ),
+                borderRadius: BorderRadius.circular(borderRadius),
+              ),
+              suffixIcon: svgIconPath != null
+                  ? IconButton(
+                      onPressed: onIconPressed,
+                      icon: SvgPicture.asset(
+                        svgIconPath!,
+                      ),
+                    )
+                  : null,
             ),
-            hintText: hintText,
-            hintStyle: TextStyle(
+            style: TextStyle(
               fontFamily: fontFamily,
               fontSize: fontSize,
               fontWeight: fontWeight,
-              color: textColor.withOpacity(0.7),
+              color: textColor,
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(borderRadius),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: isError ? Colors.red : borderColor,
-                width: 1.5,
-              ),
-              borderRadius: BorderRadius.circular(borderRadius),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: borderColor,
-              ),
-              borderRadius: BorderRadius.circular(borderRadius),
-            ),
-            suffixIcon: svgIconPath != null
-                ? IconButton(
-                    onPressed: onIconPressed,
-                    icon: SvgPicture.asset(
-                      svgIconPath!,
-                    ),
-                  )
-                : null,
-          ),
-          style: TextStyle(
-            fontFamily: fontFamily,
-            fontSize: fontSize,
-            fontWeight: fontWeight,
-            color: textColor,
           ),
         ),
         if (isError)

@@ -18,8 +18,6 @@ class ViewItems extends StatefulWidget {
 class _ViewItemsState extends State<ViewItems> {
   final List<String> _dropdownOptions = ['All', 'Lulu', 'Naleem', 'Akram'];
 
-  Stream<QuerySnapshot>? bagStream;
-
   @override
   void initState() {
     final itemBloc = BlocProvider.of<ItemBloc>(context);
@@ -89,11 +87,39 @@ class _ViewItemsState extends State<ViewItems> {
             const SizedBox(
               height: 12,
             ),
+            BlocBuilder<ItemBloc, ItemState>(builder: (context, state) {
+              if (state.isLoading && state.bags.isEmpty) {
+                return const CircularProgressIndicator();
+              } else if (state.bags.isEmpty) {
+                return const Text('Total Available Bags: 0');
+              } else if (state.bags.isNotEmpty) {
+                final totalItems = state.bags.fold<int>(
+                    0,
+                    (total, bag) =>
+                        total +
+                        (bag.quantity
+                            .fold<int>(0, (subSum, qty) => subSum + qty)));
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    children: [
+                      const Text('Total Available Bags:'),
+                      Text(
+                        ' $totalItems',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                return const SizedBox.shrink();
+              }
+            }),
             Expanded(
-              child:
-                  BlocBuilder<ItemBloc, ItemState>(builder: (context, state) {
-                if (state.isLoading && state.bags.isEmpty) {
-                  return ListView.builder(
+              child: BlocBuilder<ItemBloc, ItemState>(
+                builder: (context, state) {
+                  if (state.isLoading && state.bags.isEmpty) {
+                    return ListView.builder(
                       itemCount: 8,
                       itemBuilder: (context, index) {
                         return const BagCard(
@@ -105,35 +131,38 @@ class _ViewItemsState extends State<ViewItems> {
                           quantities: [0, 0],
                           totalQuantitySold: 0,
                         );
-                      });
-                } else if (state.bags.isEmpty) {
-                  return const Center(child: Text("No bags found."));
-                } else if (state.bags.isNotEmpty) {
-                  return ListView.builder(
-                    itemCount: state.bags.length,
-                    itemBuilder: (context, index) {
-                      Bag ds = state.bags[index];
+                      },
+                    );
+                  } else if (state.bags.isEmpty) {
+                    return const Center(child: Text("No bags found."));
+                  } else if (state.bags.isNotEmpty) {
+                    return ListView.builder(
+                      itemCount: state.bags.length,
+                      itemBuilder: (context, index) {
+                        Bag ds = state.bags[index];
 
-                      return BagCard(
-                        id: ds.id,
-                        name: ds.name,
-                        garment: ds.garment,
-                        colors: ds.colors,
-                        quantities: ds.quantity,
-                        totalQuantitySold: ds.totalQuantitySold,
-                        onTap: () {
-                          Navigator.pushNamed(context, '/viewItem', arguments: {
-                            'bagId': ds.id,
-                            'title': ds.name,
-                          });
-                        },
-                      );
-                    },
-                  );
-                } else {
-                  return const Center(child: Text("An error occurred."));
-                }
-              }),
+                        return BagCard(
+                          id: ds.id,
+                          name: ds.name,
+                          garment: ds.garment,
+                          colors: ds.colors,
+                          quantities: ds.quantity,
+                          totalQuantitySold: ds.totalQuantitySold,
+                          onTap: () {
+                            Navigator.pushNamed(context, '/viewItem',
+                                arguments: {
+                                  'bagId': ds.id,
+                                  'title': ds.name,
+                                });
+                          },
+                        );
+                      },
+                    );
+                  } else {
+                    return const Center(child: Text("An error occurred."));
+                  }
+                },
+              ),
             ),
           ],
         ),

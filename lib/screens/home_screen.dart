@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   name: user.name,
                   id: user.id,
                   itemsProcessed: user.itemsProcessed,
-                  orderDeals: user.orderDeals,
+                  orderDeals: user.orderCount,
                 );
               },
             ),

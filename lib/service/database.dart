@@ -20,6 +20,7 @@ class DatabaseMethods {
   Stream<QuerySnapshot> getAllItems() {
     return FirebaseFirestore.instance
         .collection("Bags")
+        .orderBy('name')
         .snapshots(includeMetadataChanges: true);
   }
 
@@ -34,6 +35,7 @@ class DatabaseMethods {
     return FirebaseFirestore.instance
         .collection("Bags")
         .where("garment", isEqualTo: garment)
+        .orderBy("createdAt", descending: true)
         .snapshots(includeMetadataChanges: true);
   }
 
@@ -54,6 +56,7 @@ class DatabaseMethods {
   Stream<QuerySnapshot> getAllOrders() {
     return FirebaseFirestore.instance
         .collection("Orders")
+        .orderBy("createdAt", descending: true)
         .snapshots(includeMetadataChanges: true);
   }
 

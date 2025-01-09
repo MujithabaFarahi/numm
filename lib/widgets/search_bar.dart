@@ -42,11 +42,11 @@ class CustomSearchBar extends StatelessWidget {
                     data: Theme.of(context).copyWith(
                       textSelectionTheme: TextSelectionThemeData(
                         selectionColor: ColorPalette.mainBlue[300],
-                        selectionHandleColor: ColorPalette.mainBlue[400],
+                        selectionHandleColor: ColorPalette.primaryBlue,
                       ),
                     ),
                     child: TextField(
-                      cursorColor: ColorPalette.mainBlue[300],
+                      cursorColor: ColorPalette.primaryBlue,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
