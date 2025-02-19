@@ -73,6 +73,15 @@ final class GetUserById extends ItemEvent {
   List<Object?> get props => [id];
 }
 
+final class GetReturnById extends ItemEvent {
+  final String id;
+
+  const GetReturnById(this.id);
+
+  @override
+  List<Object?> get props => [id];
+}
+
 final class GetAllReturns extends ItemEvent {
   const GetAllReturns();
 

@@ -3,6 +3,7 @@ import 'package:nummlk/screens/add_bag.dart';
 import 'package:nummlk/screens/add_item.dart';
 import 'package:nummlk/screens/add_return.dart';
 import 'package:nummlk/screens/confirm_order.dart';
+import 'package:nummlk/screens/confirm_return.dart';
 import 'package:nummlk/screens/layout_screen.dart';
 import 'package:nummlk/screens/login_screen.dart';
 import 'package:nummlk/screens/splash_screen.dart';
@@ -10,6 +11,8 @@ import 'package:nummlk/screens/update_item.dart';
 import 'package:nummlk/screens/view_item.dart';
 import 'package:nummlk/screens/view_order.dart';
 import 'package:nummlk/screens/view_orders.dart';
+import 'package:nummlk/screens/view_return.dart';
+import 'package:nummlk/screens/view_returns.dart';
 import 'package:nummlk/screens/view_user.dart';
 
 class AppRouter {
@@ -37,6 +40,22 @@ class AppRouter {
           ),
         );
 
+      case '/viewReturn':
+        final args = routeSettings.arguments as Map<String, dynamic>?;
+        return _createRoute(
+          ViewReturn(
+            returnId: args?['returnId'],
+          ),
+        );
+
+      case '/confirmReturn':
+        final args = routeSettings.arguments as Map<String, dynamic>?;
+        return _createRoute(
+          ConfirmReturn(
+            cart: args?['cart'],
+          ),
+        );
+
       case '/confirm':
         final args = routeSettings.arguments as Map<String, dynamic>?;
         return _createRoute(
@@ -48,6 +67,11 @@ class AppRouter {
       case '/orders':
         return _createRoute(
           const ViewOrders(),
+        );
+
+      case '/returns':
+        return _createRoute(
+          const ViewReturns(),
         );
 
       case '/addreturn':

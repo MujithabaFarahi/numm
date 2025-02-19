@@ -87,7 +87,7 @@ class MoreScreen extends StatelessWidget {
                 title: 'Returns',
                 icon: 'assets/icons/return.png',
                 onTap: () {
-                  // Navigator.of(context).pushNamed('/myprofile');
+                  Navigator.of(context).pushNamed('/returns');
                 },
                 isBordered: true,
               ),

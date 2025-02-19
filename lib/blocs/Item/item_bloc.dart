@@ -24,6 +24,7 @@ class ItemBloc extends Bloc<ItemEvent, ItemState> {
     on<GetAllOrders>(_onGetAllOrders);
     on<GetAllUsers>(_onGetAllUsers);
     on<GetUserById>(_onGetUserById);
+    on<GetReturnById>(_onGetReturnById);
     on<GetAllReturns>(_onGetAllReturns);
     on<GetAllBuyings>(_onGetAllBuyings);
   }
@@ -214,6 +215,28 @@ class ItemBloc extends Bloc<ItemEvent, ItemState> {
         final data = documentSnapshot.data();
         final user = User.fromMap(data!);
         emit(state.copyWith(isLoading: false, user: user));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        isError: true,
+        message: e.toString(),
+      ));
+    }
+  }
+
+  FutureOr<void> _onGetReturnById(
+      GetReturnById event, Emitter<ItemState> emit) async {
+    try {
+      print('object');
+      emit(state.copyWith(isLoading: true, isError: false, message: null));
+
+      final query = databaseMethods.getReturnById(event.id);
+
+      await for (final documentSnapshot in query) {
+        final data = documentSnapshot.data();
+        final returnn = Return.fromMap(data!);
+        emit(state.copyWith(isLoading: false, returnn: returnn));
       }
     } catch (e) {
       emit(state.copyWith(

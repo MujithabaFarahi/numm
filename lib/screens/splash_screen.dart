@@ -20,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (user != null) {
         _navigateToHome(user);
       } else {
-        Future.delayed(const Duration(seconds: 2), () {
+        Future.delayed(const Duration(seconds: 1), () {
           Navigator.pushNamedAndRemoveUntil(
             context,
             '/login',

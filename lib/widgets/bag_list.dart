@@ -6,6 +6,7 @@ class BagList extends StatelessWidget {
   final String name;
   final String id;
   final String garment;
+  final String? orderQuantity;
   final String dealer;
   final bool isLoading;
   final bool? isDaraz;
@@ -15,7 +16,8 @@ class BagList extends StatelessWidget {
     super.key,
     required this.name,
     required this.id,
-    required this.garment,
+    this.garment = '',
+    this.orderQuantity,
     this.dealer = '',
     this.isLoading = false,
     this.isDaraz,
@@ -67,15 +69,26 @@ class BagList extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                  SizedBox(
-                    child: Text(
-                      garment[0],
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
+                  if (orderQuantity != null)
+                    SizedBox(
+                      child: Text(
+                        orderQuantity!,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    )
+                  else
+                    SizedBox(
+                      child: Text(
+                        garment[0],
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),

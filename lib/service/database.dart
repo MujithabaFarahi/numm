@@ -87,9 +87,17 @@ class DatabaseMethods {
         .set(returnInfoMap);
   }
 
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getReturnById(String id) {
+    return FirebaseFirestore.instance
+        .collection("Returns")
+        .doc(id)
+        .snapshots(includeMetadataChanges: true);
+  }
+
   Stream<QuerySnapshot> getAllReturns() {
     return FirebaseFirestore.instance
         .collection("Returns")
+        .orderBy("createdAt", descending: true)
         .snapshots(includeMetadataChanges: true);
   }
 
