@@ -277,8 +277,8 @@ class _ConfirmReturnState extends State<ConfirmReturn> {
                     "createdAt": DateTime.now().toIso8601String(),
                   };
 
-                  final orderRef = firestore.collection('Orders').doc(returnId);
-                  transaction.set(orderRef, returnMap);
+                  final returnRef = firestore.collection('Returns').doc(returnId);
+                  transaction.set(returnRef, returnMap);
 
                   setState(() {
                     isLoading = false;

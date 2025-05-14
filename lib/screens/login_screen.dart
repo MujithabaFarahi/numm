@@ -72,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _navigateToHome(User user) async {
-    final userDoc = _firestore.collection('Users').doc(user.uid);
+    final userDoc = _firestore.collection('users').doc(user.uid);
     final userSnapshot = await userDoc.get();
 
     if (!userSnapshot.exists) {

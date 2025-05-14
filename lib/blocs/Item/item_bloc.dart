@@ -26,6 +26,7 @@ class ItemBloc extends Bloc<ItemEvent, ItemState> {
     on<GetUserById>(_onGetUserById);
     on<GetReturnById>(_onGetReturnById);
     on<GetAllReturns>(_onGetAllReturns);
+    on<GetBuyingById>(_onGetBuyingById);
     on<GetAllBuyings>(_onGetAllBuyings);
   }
 
@@ -272,6 +273,27 @@ class ItemBloc extends Bloc<ItemEvent, ItemState> {
     }
   }
 
+  FutureOr<void> _onGetBuyingById(
+      GetBuyingById event, Emitter<ItemState> emit) async {
+    try {
+      emit(state.copyWith(isLoading: true, isError: false, message: null));
+
+      final query = databaseMethods.getBuyingById(event.id);
+
+      await for (final documentSnapshot in query) {
+        final data = documentSnapshot.data();
+        final buying = Buying.fromMap(data!);
+        emit(state.copyWith(isLoading: false, buying: buying));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        isError: true,
+        message: e.toString(),
+      ));
+    }
+  }
+
   FutureOr<void> _onGetAllBuyings(
       GetAllBuyings event, Emitter<ItemState> emit) async {
     try {
@@ -282,7 +304,6 @@ class ItemBloc extends Bloc<ItemEvent, ItemState> {
       await for (final querySnapshot in query) {
         final buyings = querySnapshot.docs.map((doc) {
           final data = doc.data() as Map<String, dynamic>;
-
           return Buying.fromMap(data);
         }).toList();
 

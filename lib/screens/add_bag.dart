@@ -24,6 +24,7 @@ class _AddBagState extends State<AddBag> {
   String? selectedBagId;
   String? selectedBagName;
   String? selectedColor;
+  String garment = 'Akram';
   int quantity = 1;
   List<Bag> bags = [];
   bool isLoading = false;
@@ -130,13 +131,26 @@ class _AddBagState extends State<AddBag> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (selectedBagId == null)
-              CustomSearchBar(
-                onFilterTap: () {
-                  _showOptions(context, _dropdownOptions);
-                },
-                onSearch: (query) {
+              // CustomSearchBar(
+              //   onFilterTap: () {
+              //     _showOptions(context, _dropdownOptions);
+              //   },
+              //   onSearch: (query) {
+              //     final itemBloc = BlocProvider.of<ItemBloc>(context);
+              //     itemBloc.add(SearchItems(query));
+              //   },
+              // ),
+              CustomDropdown(
+                hintText: 'Select Garment',
+                labelText: 'Garment',
+                value: garment,
+                options: const ['Akram', 'Naleem', 'Lulu'],
+                onChanged: (value) {
                   final itemBloc = BlocProvider.of<ItemBloc>(context);
-                  itemBloc.add(SearchItems(query));
+                  itemBloc.add(SortByGarment(value));
+                  setState(() {
+                    garment = value;
+                  });
                 },
               ),
             if (selectedBagId == null)
@@ -446,6 +460,8 @@ class _AddBagState extends State<AddBag> {
                           })
                           .expand((x) => x)
                           .toList(),
+                      "garment": garment,
+                      "totalItems": getTotalQuantity(),
                       "createdAt": DateTime.now().toIso8601String(),
                     };
 

@@ -71,7 +71,7 @@ class MoreScreen extends StatelessWidget {
                 title: 'Buyings',
                 icon: 'assets/icons/buy.png',
                 onTap: () {
-                  // Navigator.of(context).pushNamed('/addBag');
+                  Navigator.of(context).pushNamed('/buyings');
                 },
                 isBordered: true,
               ),

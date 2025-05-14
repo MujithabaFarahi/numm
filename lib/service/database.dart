@@ -104,6 +104,7 @@ class DatabaseMethods {
   Stream<QuerySnapshot> getAllBuyings() {
     return FirebaseFirestore.instance
         .collection("Buyings")
+        .orderBy("createdAt", descending: true)
         .snapshots(includeMetadataChanges: true);
   }
 

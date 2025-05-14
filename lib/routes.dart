@@ -8,6 +8,8 @@ import 'package:nummlk/screens/layout_screen.dart';
 import 'package:nummlk/screens/login_screen.dart';
 import 'package:nummlk/screens/splash_screen.dart';
 import 'package:nummlk/screens/update_item.dart';
+import 'package:nummlk/screens/view_buying.dart';
+import 'package:nummlk/screens/view_buyings.dart';
 import 'package:nummlk/screens/view_item.dart';
 import 'package:nummlk/screens/view_order.dart';
 import 'package:nummlk/screens/view_orders.dart';
@@ -67,6 +69,19 @@ class AppRouter {
       case '/orders':
         return _createRoute(
           const ViewOrders(),
+        );
+
+      case '/buyings':
+        return _createRoute(
+          const ViewBuyings(),
+        );
+
+      case '/viewBuying':
+        final args = routeSettings.arguments as Map<String, dynamic>?;
+        return _createRoute(
+          ViewBuying(
+            buyingId: args?['buyingId'],
+          ),
         );
 
       case '/returns':

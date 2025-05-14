@@ -196,9 +196,10 @@ class _AddReturnState extends State<AddReturn> {
                   )
                 ],
               ),
-            const SizedBox(
-              height: 12,
-            ),
+            if (selectedBagId != null)
+              const SizedBox(
+                height: 12,
+              ),
             if (selectedBagId != null)
               CustomDropdown(
                 hintText: 'Select Color',
@@ -213,7 +214,7 @@ class _AddReturnState extends State<AddReturn> {
                   });
                 },
               ),
-            if (selectedColor != null)
+            if (selectedColor != null && selectedBagId != null)
               Row(
                 children: [
                   IconButton(
@@ -237,15 +238,19 @@ class _AddReturnState extends State<AddReturn> {
                   ),
                 ],
               ),
-            const SizedBox(height: 16),
-            if (selectedColor != null)
+            if (selectedColor != null && selectedBagId != null)
+              const SizedBox(height: 16),
+            if (selectedColor != null && selectedBagId != null)
               PrimaryButton(
                 onPressed: () {
                   _addToCart(selectedBagName!);
                 },
                 text: 'Add Bag',
               ),
-            const SizedBox(height: 16),
+            if (selectedColor != null &&
+                selectedBagId != null &&
+                cart.isNotEmpty)
+              const SizedBox(height: 16),
             if (cart.isNotEmpty)
               Expanded(
                 child: Column(
