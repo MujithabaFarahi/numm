@@ -26,9 +26,8 @@ class _ConfirmReturnState extends State<ConfirmReturn> {
   List<Bag> bags = [];
   List<User> users = [];
   List<User> selectedUsers = [];
-  bool isDaraz = true;
   String? selectedUserId;
-  String? selectedUserName;
+  String? selectedUserName = 'Daraz';
   bool isLoading = false;
 
   @override
@@ -108,59 +107,27 @@ class _ConfirmReturnState extends State<ConfirmReturn> {
               ),
             ),
             const SizedBox(height: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Checkbox(
-                      checkColor: ColorPalette.white,
-                      activeColor: ColorPalette.primaryBlue,
-                      value: isDaraz,
-                      onChanged: (daraz) {
-                        setState(() {
-                          isDaraz = daraz!;
-                        });
-                        if (!isDaraz) {
-                          setState(() {
-                            selectedUserId = null;
-                            selectedUserName = null;
-                          });
-                        }
-                      },
-                    ),
-                    const Text('Daraz Order'),
-                  ],
-                ),
-                if (!isDaraz) const SizedBox(height: 4),
-                if (!isDaraz)
-                  CustomDropdown(
-                    hintText: 'Select Order Dealer',
-                    labelText: 'Order Dealer',
-                    value: selectedUserName,
-                    options: users.map((user) => user.name).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedUserName = value;
-                        selectedUserId =
-                            users.firstWhere((user) => user.name == value).id;
-                      });
-                    },
-                  ),
-              ],
+            CustomDropdown(
+              hintText: 'Select Order Dealer',
+              labelText: 'Order Dealer',
+              value: selectedUserName,
+              options: [...users.map((user) => user.name), 'Daraz'],
+              onChanged: (value) {
+                setState(() {
+                  selectedUserName = value;
+                  if (value == 'Daraz') {
+                    selectedUserId = null;
+                  } else {
+                    selectedUserId =
+                        users.firstWhere((user) => user.name == value).id;
+                  }
+                });
+              },
             ),
             const SizedBox(height: 12),
             PrimaryButton(
               isLoading: isLoading,
               onPressed: () async {
-                if (!isDaraz && selectedUserId == null) {
-                  CustomToast.show(
-                    'Please Select order Dealer',
-                    bgColor: ColorPalette.negativeColor[500]!,
-                  );
-                  return;
-                }
-
                 setState(() {
                   isLoading = true;
                 });
@@ -272,12 +239,13 @@ class _ConfirmReturnState extends State<ConfirmReturn> {
                         .expand((x) => x)
                         .toList(),
                     "totalItems": getTotalQuantity(),
-                    "darazOrder": isDaraz,
+                    "darazOrder": selectedUserId != null ? false : true,
                     "orderDealer": selectedUserName,
                     "createdAt": DateTime.now().toIso8601String(),
                   };
 
-                  final returnRef = firestore.collection('Returns').doc(returnId);
+                  final returnRef =
+                      firestore.collection('Returns').doc(returnId);
                   transaction.set(returnRef, returnMap);
 
                   setState(() {
@@ -285,7 +253,7 @@ class _ConfirmReturnState extends State<ConfirmReturn> {
                   });
                 }).then((_) {
                   CustomToast.show(
-                    'Order added successfully',
+                    'Return added successfully',
                     duration: 2,
                   );
                   if (mounted) {

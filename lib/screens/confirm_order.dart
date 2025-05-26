@@ -27,9 +27,8 @@ class _ConfirmOrderState extends State<ConfirmOrder> {
   List<Bag> bags = [];
   List<User> users = [];
   List<User> selectedUsers = [];
-  bool isDaraz = true;
   String? selectedUserId;
-  String? selectedUserName;
+  String? selectedUserName = 'Daraz';
   bool isLoading = false;
 
   @override
@@ -109,77 +108,53 @@ class _ConfirmOrderState extends State<ConfirmOrder> {
               ),
             ),
             const SizedBox(height: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Checkbox(
-                      checkColor: ColorPalette.white,
-                      activeColor: ColorPalette.primaryBlue,
-                      value: isDaraz,
-                      onChanged: (daraz) {
+            CustomDropdown(
+              hintText: 'Select Order Dealer',
+              labelText: 'Order Dealer',
+              value: selectedUserName,
+              options: [...users.map((user) => user.name), 'Daraz'],
+              onChanged: (value) {
+                setState(() {
+                  selectedUserName = value;
+                  if (value == 'Daraz') {
+                    selectedUserId = null;
+                  } else {
+                    selectedUserId =
+                        users.firstWhere((user) => user.name == value).id;
+                  }
+                });
+              },
+            ),
+            const SizedBox(height: 12),
+            const Text('Packed By:'),
+            const SizedBox(height: 6),
+            SizedBox(
+              height: 195,
+              child: ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: users.length,
+                itemBuilder: (context, index) {
+                  final user = users[index];
+                  final isSelected = selectedUsers.contains(user);
+
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: CustomCard(
+                      title: user.name,
+                      isSelected: isSelected,
+                      onTap: () {
                         setState(() {
-                          isDaraz = daraz!;
+                          if (isSelected) {
+                            selectedUsers.remove(user);
+                          } else {
+                            selectedUsers.add(user);
+                          }
                         });
-                        if (!isDaraz) {
-                          setState(() {
-                            selectedUserId = null;
-                            selectedUserName = null;
-                          });
-                        }
                       },
                     ),
-                    const Text('Daraz Order'),
-                  ],
-                ),
-                if (!isDaraz) const SizedBox(height: 4),
-                if (!isDaraz)
-                  CustomDropdown(
-                    hintText: 'Select Order Dealer',
-                    labelText: 'Order Dealer',
-                    value: selectedUserName,
-                    options: users.map((user) => user.name).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedUserName = value;
-                        selectedUserId =
-                            users.firstWhere((user) => user.name == value).id;
-                      });
-                    },
-                  ),
-                const SizedBox(height: 12),
-                const Text('Packed By:'),
-                const SizedBox(height: 6),
-                SizedBox(
-                  height: 195,
-                  child: ListView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: users.length,
-                    itemBuilder: (context, index) {
-                      final user = users[index];
-                      final isSelected = selectedUsers.contains(user);
-
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12.0),
-                        child: CustomCard(
-                          title: user.name,
-                          isSelected: isSelected,
-                          onTap: () {
-                            setState(() {
-                              if (isSelected) {
-                                selectedUsers.remove(user);
-                              } else {
-                                selectedUsers.add(user);
-                              }
-                            });
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
+                  );
+                },
+              ),
             ),
             const SizedBox(height: 12),
             PrimaryButton(
@@ -188,14 +163,6 @@ class _ConfirmOrderState extends State<ConfirmOrder> {
                 if (selectedUsers.isEmpty) {
                   CustomToast.show(
                     'Please Select at least 1 packager',
-                    bgColor: ColorPalette.negativeColor[500]!,
-                  );
-                  return;
-                }
-
-                if (!isDaraz && selectedUserId == null) {
-                  CustomToast.show(
-                    'Please Select order Dealer',
                     bgColor: ColorPalette.negativeColor[500]!,
                   );
                   return;
@@ -335,7 +302,7 @@ class _ConfirmOrderState extends State<ConfirmOrder> {
                     "status": "Pending",
                     "totalItems": getTotalQuantity(),
                     "createdAt": DateTime.now().toIso8601String(),
-                    "darazOrder": isDaraz,
+                    "darazOrder": selectedUserId == null ? true : false,
                     "orderDealer": selectedUserName,
                     "packagers": selectedUsers.map((user) {
                       return {
