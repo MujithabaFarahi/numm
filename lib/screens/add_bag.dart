@@ -10,7 +10,6 @@ import 'package:nummlk/widgets/custom_dropdown.dart';
 import 'package:nummlk/widgets/custom_toast.dart';
 import 'package:nummlk/widgets/primary_button.dart';
 import 'package:nummlk/widgets/primary_textfield.dart';
-import 'package:nummlk/widgets/search_bar.dart';
 
 class AddBag extends StatefulWidget {
   const AddBag({super.key});
@@ -20,7 +19,6 @@ class AddBag extends StatefulWidget {
 }
 
 class _AddBagState extends State<AddBag> {
-  final List<String> _dropdownOptions = ['All', 'Lulu', 'Naleem', 'Akram'];
   String? selectedBagId;
   String? selectedBagName;
   String? selectedColor;
@@ -40,7 +38,7 @@ class _AddBagState extends State<AddBag> {
     _quantityController.text = quantity.toString();
 
     final itemBloc = BlocProvider.of<ItemBloc>(context);
-    itemBloc.add(const GetAllItems());
+    itemBloc.add(SortByGarment(garment));
   }
 
   @override
@@ -95,29 +93,6 @@ class _AddBagState extends State<AddBag> {
     }
   }
 
-  void _showOptions(BuildContext context, List<String> options) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: ListView(
-            children: options.map((option) {
-              return ListTile(
-                title: Text(option),
-                onTap: () {
-                  final itemBloc = BlocProvider.of<ItemBloc>(context);
-                  itemBloc.add(SortByGarment(option));
-                  Navigator.pop(context);
-                },
-              );
-            }).toList(),
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -131,15 +106,6 @@ class _AddBagState extends State<AddBag> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (selectedBagId == null)
-              // CustomSearchBar(
-              //   onFilterTap: () {
-              //     _showOptions(context, _dropdownOptions);
-              //   },
-              //   onSearch: (query) {
-              //     final itemBloc = BlocProvider.of<ItemBloc>(context);
-              //     itemBloc.add(SearchItems(query));
-              //   },
-              // ),
               CustomDropdown(
                 hintText: 'Select Garment',
                 labelText: 'Garment',

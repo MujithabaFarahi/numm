@@ -27,8 +27,24 @@ class _ConfirmReturnState extends State<ConfirmReturn> {
   List<User> users = [];
   List<User> selectedUsers = [];
   String? selectedUserId;
-  String? selectedUserName = 'Daraz';
+  String selectedUserName = '';
   bool isLoading = false;
+  DateTime _selectedDate = DateTime.now();
+
+  Future<void> _pickDate() async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: _selectedDate.subtract(const Duration(days: 365)),
+      lastDate: _selectedDate,
+    );
+
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -61,6 +77,21 @@ class _ConfirmReturnState extends State<ConfirmReturn> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Order Date: ${_selectedDate.toLocal().toIso8601String().split('T')[0]}',
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.calendar_today),
+                  onPressed: _pickDate,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
             Text(
               'Total Quantity: ${getTotalQuantity()}',
               style: const TextStyle(fontSize: 16),
@@ -128,6 +159,14 @@ class _ConfirmReturnState extends State<ConfirmReturn> {
             PrimaryButton(
               isLoading: isLoading,
               onPressed: () async {
+                if (selectedUserName.isEmpty) {
+                  CustomToast.show(
+                    'Please Select Order Dealer',
+                    bgColor: ColorPalette.negativeColor[500]!,
+                  );
+                  return;
+                }
+
                 setState(() {
                   isLoading = true;
                 });
@@ -241,7 +280,7 @@ class _ConfirmReturnState extends State<ConfirmReturn> {
                     "totalItems": getTotalQuantity(),
                     "darazOrder": selectedUserId != null ? false : true,
                     "orderDealer": selectedUserName,
-                    "createdAt": DateTime.now().toIso8601String(),
+                    "createdAt": _selectedDate.toIso8601String(),
                   };
 
                   final returnRef =

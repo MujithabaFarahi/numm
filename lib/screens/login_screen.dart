@@ -32,23 +32,23 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _registerWithEmailPassword() async {
-    try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+  // Future<void> _registerWithEmailPassword() async {
+  //   try {
+  //     UserCredential userCredential =
+  //         await _auth.createUserWithEmailAndPassword(
+  //       email: _emailController.text.trim(),
+  //       password: _passwordController.text.trim(),
+  //     );
 
-      await _firestore.collection('Users').doc(userCredential.user!.uid).set({
-        'email': userCredential.user!.email ?? '',
-      });
+  //     await _firestore.collection('Users').doc(userCredential.user!.uid).set({
+  //       'email': userCredential.user!.email ?? '',
+  //     });
 
-      await _navigateToHome(userCredential.user!);
-    } catch (e) {
-      _showError("Registration failed: $e");
-    }
-  }
+  //     await _navigateToHome(userCredential.user!);
+  //   } catch (e) {
+  //     _showError("Registration failed: $e");
+  //   }
+  // }
 
   Future<void> _loginWithGoogle() async {
     try {
@@ -72,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _navigateToHome(User user) async {
-    final userDoc = _firestore.collection('users').doc(user.uid);
+    final userDoc = _firestore.collection('Users').doc(user.uid);
     final userSnapshot = await userDoc.get();
 
     if (!userSnapshot.exists) {
@@ -93,22 +93,22 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _resetPassword() async {
-    if (_emailController.text.trim().isEmpty) {
-      _showError("Please enter your email address to reset your password.");
-      return;
-    }
+  // Future<void> _resetPassword() async {
+  //   if (_emailController.text.trim().isEmpty) {
+  //     _showError("Please enter your email address to reset your password.");
+  //     return;
+  //   }
 
-    try {
-      await _auth.sendPasswordResetEmail(email: _emailController.text.trim());
-      CustomToast.show(
-        "Password reset email has been sent. Please check your inbox.",
-        bgColor: Colors.green,
-      );
-    } catch (e) {
-      _showError("Password reset failed: $e");
-    }
-  }
+  //   try {
+  //     await _auth.sendPasswordResetEmail(email: _emailController.text.trim());
+  //     CustomToast.show(
+  //       "Password reset email has been sent. Please check your inbox.",
+  //       bgColor: Colors.green,
+  //     );
+  //   } catch (e) {
+  //     _showError("Password reset failed: $e");
+  //   }
+  // }
 
   void _showError(String message) {
     CustomToast.show(
@@ -196,13 +196,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                   foregroundColor: Colors.black,
                                 ),
                                 const SizedBox(height: 20),
-                                PrimaryButton(
-                                  text: "Register",
-                                  onPressed: _registerWithEmailPassword,
-                                  backgroundColor: Colors.white,
-                                  foregroundColor: Colors.black,
-                                ),
-                                const SizedBox(height: 20),
+                                // PrimaryButton(
+                                //   text: "Register",
+                                //   onPressed: _registerWithEmailPassword,
+                                //   backgroundColor: Colors.white,
+                                //   foregroundColor: Colors.black,
+                                // ),
+                                // const SizedBox(height: 20),
                                 PrimaryButton(
                                   text: "Sign in with Google",
                                   icon: 'assets/icons/google.png',
